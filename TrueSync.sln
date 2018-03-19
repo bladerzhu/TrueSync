@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueSync", "TrueSync.csproj", "{99331DE8-6F07-4D45-6483-5DAEA1D421C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueSync.Plugins", "TrueSync.Plugins.csproj", "{00D8D446-5901-EC42-C695-E451D9D997E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrueSync.Editor", "TrueSync.Editor.csproj", "{14FD1DD7-E051-677C-6370-8703AD2D632C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99331DE8-6F07-4D45-6483-5DAEA1D421C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99331DE8-6F07-4D45-6483-5DAEA1D421C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99331DE8-6F07-4D45-6483-5DAEA1D421C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99331DE8-6F07-4D45-6483-5DAEA1D421C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00D8D446-5901-EC42-C695-E451D9D997E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00D8D446-5901-EC42-C695-E451D9D997E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00D8D446-5901-EC42-C695-E451D9D997E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00D8D446-5901-EC42-C695-E451D9D997E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14FD1DD7-E051-677C-6370-8703AD2D632C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14FD1DD7-E051-677C-6370-8703AD2D632C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14FD1DD7-E051-677C-6370-8703AD2D632C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14FD1DD7-E051-677C-6370-8703AD2D632C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
