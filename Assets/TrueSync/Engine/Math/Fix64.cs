@@ -23,7 +23,10 @@ namespace TrueSync {
 		public const long PI_TIMES_2 = 0x6487ED511;
 		public const long PI = 0x3243F6A88;
 		public const long PI_OVER_2 = 0x1921FB544;
-		public const int LUT_SIZE = (int)(PI_OVER_2 >> 15);
+        public const long LN2 = 0xB17217F7;
+        public const long LOG2MAX = 0x1F00000000;
+        public const long LOG2MIN = -0x2000000000;
+        public const int LUT_SIZE = (int)(PI_OVER_2 >> 15);
 
         // Precision of this type is 2^-32, that is 2,3283064365386962890625E-10
         public static readonly decimal Precision = (decimal)(new FP(1L));//0.00000000023283064365386962890625m;
@@ -62,6 +65,10 @@ namespace TrueSync {
         public static readonly FP Rad2Deg = new FP(180) / Pi;
 
 		public static readonly FP LutInterval = (FP)(LUT_SIZE - 1) / PiOver2;
+
+        public static readonly FP Log2Max = new FP(LOG2MAX);
+        public static readonly FP Log2Min = new FP(LOG2MIN);
+        public static readonly FP Ln2 = new FP(LN2);
 
         /// <summary>
         /// Returns a number indicating the sign of a Fix64 number.

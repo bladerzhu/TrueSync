@@ -107,6 +107,11 @@
         **/
         void TSApplyTorque(TSVector force);
 
+        /**
+         * @brief Applies a torque force to the body.
+         **/
+        void TSApplyRelativeTorque(TSVector force);
+
     }
 
 }

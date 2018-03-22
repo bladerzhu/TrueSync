@@ -15,6 +15,8 @@ namespace TrueSync
 		public TSVector normal { get; set; }
 		public FP distance { get; set; }
 
+        public TSRaycastHit() { }
+
 		public TSRaycastHit(TSRigidBody rigidbody, TSCollider collider, TSTransform transform, TSVector normal, TSVector origin, TSVector direction, FP fraction)
 		{
 			this.rigidbody = rigidbody;

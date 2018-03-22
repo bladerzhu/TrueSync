@@ -1,4 +1,5 @@
-﻿/* Copyright (C) <2009-2011> <Thorben Linneweber, Jitter Physics>
+﻿using System;
+/* Copyright (C) <2009-2011> <Thorben Linneweber, Jitter Physics>
 * 
 *  This software is provided 'as-is', without any express or implied
 *  warranty.  In no event will the authors be held liable for any damages
@@ -283,5 +284,172 @@ namespace TrueSync {
             return result;
         }
 
+
+        /// <summary>
+        /// Returns 2 raised to the specified power.
+        /// Provides at least 6 decimals of accuracy.
+        /// </summary>
+        internal static FP Pow2(FP x)
+        {
+            if (x.RawValue == 0)
+            {
+                return FP.One;
+            }
+
+            // Avoid negative arguments by exploiting that exp(-x) = 1/exp(x).
+            bool neg = x.RawValue < 0;
+            if (neg)
+            {
+                x = -x;
+            }
+
+            if (x == FP.One)
+            {
+                return neg ? FP.One / (FP)2 : (FP)2;
+            }
+            if (x >= FP.Log2Max)
+            {
+                return neg ? FP.One / FP.MaxValue : FP.MaxValue;
+            }
+            if (x <= FP.Log2Min)
+            {
+                return neg ? FP.MaxValue : FP.Zero;
+            }
+
+            /* The algorithm is based on the power series for exp(x):
+             * http://en.wikipedia.org/wiki/Exponential_function#Formal_definition
+             * 
+             * From term n, we get term n+1 by multiplying with x/n.
+             * When the sum term drops to zero, we can stop summing.
+             */
+
+            int integerPart = (int)Floor(x);
+            // Take fractional part of exponent
+            x = FP.FromRaw(x.RawValue & 0x00000000FFFFFFFF);
+
+            var result = FP.One;
+            var term = FP.One;
+            int i = 1;
+            while (term.RawValue != 0)
+            {
+                term = FP.FastMul(FP.FastMul(x, term), FP.Ln2) / (FP)i;
+                result += term;
+                i++;
+            }
+
+            result = FP.FromRaw(result.RawValue << integerPart);
+            if (neg)
+            {
+                result = FP.One / result;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the base-2 logarithm of a specified number.
+        /// Provides at least 9 decimals of accuracy.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The argument was non-positive
+        /// </exception>
+        internal static FP Log2(FP x)
+        {
+            if (x.RawValue <= 0)
+            {
+                throw new ArgumentOutOfRangeException("Non-positive value passed to Ln", "x");
+            }
+
+            // This implementation is based on Clay. S. Turner's fast binary logarithm
+            // algorithm (C. S. Turner,  "A Fast Binary Logarithm Algorithm", IEEE Signal
+            //     Processing Mag., pp. 124,140, Sep. 2010.)
+
+            long b = 1U << (FP.FRACTIONAL_PLACES - 1);
+            long y = 0;
+
+            long rawX = x.RawValue;
+            while (rawX < FP.ONE)
+            {
+                rawX <<= 1;
+                y -= FP.ONE;
+            }
+
+            while (rawX >= (FP.ONE << 1))
+            {
+                rawX >>= 1;
+                y += FP.ONE;
+            }
+
+            var z = FP.FromRaw(rawX);
+
+            for (int i = 0; i < FP.FRACTIONAL_PLACES; i++)
+            {
+                z = FP.FastMul(z, z);
+                if (z.RawValue >= (FP.ONE << 1))
+                {
+                    z = FP.FromRaw(z.RawValue >> 1);
+                    y += b;
+                }
+                b >>= 1;
+            }
+
+            return FP.FromRaw(y);
+        }
+
+        /// <summary>
+        /// Returns the natural logarithm of a specified number.
+        /// Provides at least 7 decimals of accuracy.
+        /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The argument was non-positive
+        /// </exception>
+        public static FP Ln(FP x)
+        {
+            return FP.FastMul(Log2(x), FP.Ln2);
+        }
+
+        /// <summary>
+        /// Returns a specified number raised to the specified power.
+        /// Provides about 5 digits of accuracy for the result.
+        /// </summary>
+        /// <exception cref="DivideByZeroException">
+        /// The base was zero, with a negative exponent
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The base was negative, with a non-zero exponent
+        /// </exception>
+        public static FP Pow(FP b, FP exp)
+        {
+            if (b == FP.One)
+            {
+                return FP.One;
+            }
+
+            if (exp.RawValue == 0)
+            {
+                return FP.One;
+            }
+
+            if (b.RawValue == 0)
+            {
+                if (exp.RawValue < 0)
+                {
+                    //throw new DivideByZeroException();
+                    return FP.MaxValue;
+                }
+                return FP.Zero;
+            }
+
+            FP log2 = Log2(b);
+            return Pow2(exp * log2);
+        }
+
+        public static FP MoveTowards(FP current, FP target, FP maxDistanceDelta)
+        {
+            if ((current + maxDistanceDelta) < target)
+                return current + maxDistanceDelta;
+            else
+                return target;
+        }
     }
 }

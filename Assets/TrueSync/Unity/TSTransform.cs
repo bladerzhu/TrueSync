@@ -289,6 +289,77 @@ namespace TrueSync {
             }
         }
 
+        /**
+         *  @brief Transform a point from local space to world space.
+         **/
+        public TSVector TransformPoint(TSVector point)
+        {
+            TSVector result = TSVector.Transform(point, TSMatrix.CreateFromQuaternion(rotation));
+            result.x *= scale.x;
+            result.y *= scale.y;
+            result.z *= scale.z;
+            return result + this.position;
+        }
+
+        /**
+         *  @brief Transform a point from world space to local space.
+         **/
+        public TSVector InverseTransformPoint(TSVector point)
+        {
+            point -= this.position;
+            point.x /= scale.x;
+            point.y /= scale.y;
+            point.z /= scale.z;
+            TSMatrix m = TSMatrix.CreateFromQuaternion(rotation);
+            m = TSMatrix.Inverse(m);
+            TSVector result = TSVector.Transform(point, m);
+            return result;
+        }
+
+        /**
+         *  @brief Transform a direction from local space to world space.
+         **/
+        public TSVector TransformDirection(TSVector direction)
+        {
+            return TSVector.Transform(direction, TSMatrix.CreateFromQuaternion(rotation));
+        }
+
+        /**
+         *  @brief Transform a direction from world space to local space.
+         **/
+        public TSVector InverseTransformDirection(TSVector direction)
+        {
+            TSMatrix m = TSMatrix.CreateFromQuaternion(rotation);
+            m = TSMatrix.Inverse(m);
+            return TSVector.Transform(direction, m);
+        }
+
+        /**
+         *  @brief Transform a vector from local space to world space.
+         **/
+        public TSVector TransformVector(TSVector vector)
+        {
+            TSVector result = TSVector.Transform(vector, TSMatrix.CreateFromQuaternion(rotation));
+            result.x *= scale.x;
+            result.y *= scale.y;
+            result.z *= scale.z;
+            return result;
+        }
+
+        /**
+         *  @brief Transform a vector from world space to local space.
+         **/
+        public TSVector InverseTransformVector(TSVector vector)
+        {
+            vector.x /= scale.x;
+            vector.y /= scale.y;
+            vector.z /= scale.z;
+            TSMatrix m = TSMatrix.CreateFromQuaternion(rotation);
+            m = TSMatrix.Inverse(m);
+            TSVector result = TSVector.Transform(vector, m);
+            return result;
+        }
+
         [HideInInspector]
         public TSCollider tsCollider;
 

@@ -387,6 +387,19 @@ namespace TrueSync.Physics3D {
             TSVector.Add(ref torque, ref this.torque, out this.torque);
         }
 
+        /// <summary>
+        /// Adds torque to the body. The torque gets applied
+        /// the next time <see cref="World.Step"/> is called. The 'impact'
+        /// of the torque depends on the time it is applied to a body - so
+        /// the timestep influences the energy added to the body.
+        /// </summary>
+        /// <param name="torque">The torque to add next <see cref="World.Step"/>.</param>
+        public void AddRelativeTorque(TSVector torque)
+        {
+            torque = TSVector.Transform(torque, this.TSOrientation);
+            TSVector.Add(ref torque, ref this.torque, out this.torque);
+        }
+
         protected bool useShapeMassProperties = true;
 
         /// <summary>
@@ -947,6 +960,10 @@ namespace TrueSync.Physics3D {
 
         public void TSApplyTorque(TSVector force) {
             AddTorque(force);
+        }
+
+        public void TSApplyRelativeTorque(TSVector force) {
+            AddRelativeTorque(force);
         }
 
     }

@@ -258,6 +258,15 @@ namespace TrueSync {
             tsCollider.Body.TSApplyTorque(torque);
         }
 
+        /**
+         *  @brief Simulates the provided relative tourque in the body. 
+         *  
+         *  @param torque A {@link TSVector} representing the relative torque to be applied.
+         **/
+        public void AddRelativeTorque(TSVector torque)
+        {
+            tsCollider.Body.TSApplyRelativeTorque(torque);
+        }
 
         /**
          *  @brief Changes orientation to look at target position. 
