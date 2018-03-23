@@ -233,7 +233,7 @@ namespace TrueSync.Physics3D {
         /// against rays (rays are of infinite length). They are checked against segments
         /// which start at rayOrigin and end in rayOrigin + rayDirection.
         /// </summary>
-        public override bool Raycast(TSVector rayOrigin, TSVector rayDirection, RaycastCallback raycast, int layer, out RigidBody body, out TSVector normal, out FP fraction)
+        public override bool Raycast(TSVector rayOrigin, TSVector rayDirection, RaycastCallback raycast, int layerMask, out RigidBody body, out TSVector normal, out FP fraction)
         {
             body = null; normal = TSVector.zero; fraction = FP.MaxValue;
 
@@ -248,7 +248,8 @@ namespace TrueSync.Physics3D {
                     SoftBody softBody = e as SoftBody;
                     foreach (RigidBody b in softBody.VertexBodies)
                     {
-                        if (PhysicsManager.instance.GetBodyLayer(b) != layer)
+                        int bodyLayerMask = 1 << PhysicsManager.instance.GetBodyLayer(b);
+                        if ((layerMask & bodyLayerMask) != bodyLayerMask)
                             continue;
 
                         if (this.Raycast(b, rayOrigin, rayDirection, out tempNormal, out tempFraction))
@@ -266,7 +267,8 @@ namespace TrueSync.Physics3D {
                 else
                 {
                     RigidBody b = e as RigidBody;
-                    if (PhysicsManager.instance.GetBodyLayer(b) != layer)
+                    int bodyLayerMask = 1 << PhysicsManager.instance.GetBodyLayer(b);
+                    if ((layerMask & bodyLayerMask) != bodyLayerMask)
                         continue;
 
                     if (this.Raycast(b, rayOrigin, rayDirection, out tempNormal, out tempFraction))

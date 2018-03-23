@@ -594,7 +594,7 @@ namespace TrueSync.Physics3D {
         /// </summary>
         public abstract bool Raycast(TSVector rayOrigin, TSVector rayDirection, RaycastCallback raycast, out RigidBody body, out TSVector normal, out FP fraction);
 
-        public abstract bool Raycast(TSVector rayOrigin, TSVector rayDirection, RaycastCallback raycast, int layer, out RigidBody body, out TSVector normal, out FP fraction);
+        public abstract bool Raycast(TSVector rayOrigin, TSVector rayDirection, RaycastCallback raycast, int layerMask, out RigidBody body, out TSVector normal, out FP fraction);
 
         /// <summary>
         /// Raycasts a single body. NOTE: For performance reasons terrain and trianglemeshshape aren't checked

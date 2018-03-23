@@ -9,7 +9,7 @@ namespace TrueSync {
 
         private const int COLLISION_LAYERS = 32;
         // 32 layers -> 516 unique intersections
-        private const int COLLISION_TOGGLES = 516;
+        private const int COLLISION_TOGGLES = 1024;
 
         /**
          * @brief Synchronization window size.

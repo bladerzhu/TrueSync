@@ -224,7 +224,7 @@ namespace TrueSync {
          *  @param position Indicates the location where the force should hit.
          **/
         public void AddForceAtPosition(TSVector force, TSVector position) {
-            AddForceAtPosition(force, position, ForceMode.Impulse);
+            AddForceAtPosition(force, position, ForceMode.Force);
         }
 
         /**

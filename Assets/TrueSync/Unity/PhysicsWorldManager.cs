@@ -145,10 +145,10 @@ namespace TrueSync {
             return result;
         }
 
-        public bool Raycast(TSVector rayOrigin, TSVector rayDirection, RaycastCallback raycast, int layer, out IBody body, out TSVector normal, out FP fraction)
+        public bool Raycast(TSVector rayOrigin, TSVector rayDirection, RaycastCallback raycast, int layerMask, out IBody body, out TSVector normal, out FP fraction)
         {
             RigidBody rb;
-            bool result = world.CollisionSystem.Raycast(rayOrigin, rayDirection, raycast, layer, out rb, out normal, out fraction);
+            bool result = world.CollisionSystem.Raycast(rayOrigin, rayDirection, raycast, layerMask, out rb, out normal, out fraction);
             body = rb;
             return result;
         }
@@ -182,7 +182,7 @@ namespace TrueSync {
             return null;
         }
 
-        public TSRaycastHit Raycast(TSRay ray, FP maxDistance, int layer, RaycastCallback callback = null)
+        public TSRaycastHit Raycast(TSRay ray, FP maxDistance, int layerMask, RaycastCallback callback = null)
         {
             IBody hitBody;
             TSVector hitNormal;
@@ -192,7 +192,7 @@ namespace TrueSync {
             TSVector direction = ray.direction;
 
             direction *= maxDistance;
-            if (Raycast(origin, direction, callback, layer, out hitBody, out hitNormal, out hitFraction))
+            if (Raycast(origin, direction, callback, layerMask, out hitBody, out hitNormal, out hitFraction))
             {
                 GameObject other = PhysicsManager.instance.GetGameObject(hitBody);
                 TSRigidBody bodyComponent = other.GetComponent<TSRigidBody>();
