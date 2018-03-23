@@ -51,6 +51,12 @@ namespace TrueSync {
         **/
         public static FP Rad2Deg = FP.Rad2Deg;
 
+
+        /**
+         * @brief FP infinity.
+         * */
+        public static FP Infinity = FP.MaxValue;
+
         /// <summary>
         /// Gets the square root.
         /// </summary>
@@ -109,8 +115,15 @@ namespace TrueSync {
         /// <returns>The clamped value.</returns>
         #region public static FP Clamp(FP value, FP min, FP max)
         public static FP Clamp(FP value, FP min, FP max) {
-            value = (value > max) ? max : value;
-            value = (value < min) ? min : value;
+            if (value < min)
+            {
+                value = min;
+                return value;
+            }
+            if (value > max)
+            {
+                value = max;
+            }
             return value;
         }
         #endregion
@@ -122,8 +135,12 @@ namespace TrueSync {
         /// <returns>The clamped value.</returns>
         public static FP Clamp01(FP value)
         {
-            value = (value > FP.One) ? FP.One : value;
-            value = (value < FP.Zero) ? FP.Zero : value;
+            if (value < FP.Zero)
+                return FP.Zero;
+
+            if (value > FP.One)
+                return FP.One;
+
             return value;
         }
 
@@ -272,7 +289,13 @@ namespace TrueSync {
         }
 
         public static FP Lerp(FP value1, FP value2, FP amount) {
-            return value1 + (value2 - value1) * amount;
+            return value1 + (value2 - value1) * Clamp01(amount);
+        }
+
+        public static FP InverseLerp(FP value1, FP value2, FP amount) {
+            if (value1 != value2)
+                return Clamp01((amount - value1) / (value2 - value1));
+            return FP.Zero;
         }
 
         public static FP SmoothStep(FP value1, FP value2, FP amount) {
@@ -444,12 +467,67 @@ namespace TrueSync {
             return Pow2(exp * log2);
         }
 
-        public static FP MoveTowards(FP current, FP target, FP maxDistanceDelta)
+        public static FP MoveTowards(FP current, FP target, FP maxDelta)
         {
-            if ((current + maxDistanceDelta) < target)
-                return current + maxDistanceDelta;
-            else
+            if (Abs(target - current) <= maxDelta)
                 return target;
+            return (current + (Sign(target - current)) * maxDelta);
+        }
+
+        public static FP Repeat(FP t, FP length)
+        {
+            return (t - (Floor(t / length) * length));
+        }
+
+        public static FP DeltaAngle(FP current, FP target)
+        {
+            FP num = Repeat(target - current, (FP)360f);
+            if (num > (FP)180f)
+            {
+                num -= (FP)360f;
+            }
+            return num;
+        }
+
+        public static FP MoveTowardsAngle(FP current, FP target, float maxDelta)
+        {
+            target = current + DeltaAngle(current, target);
+            return MoveTowards(current, target, maxDelta);
+        }
+
+        public static FP SmoothDamp(FP current, FP target, ref FP currentVelocity, FP smoothTime, FP maxSpeed)
+        {
+            FP deltaTime = FP.EN2;
+            return SmoothDamp(current, target, ref currentVelocity, smoothTime, maxSpeed, deltaTime);
+        }
+
+        public static FP SmoothDamp(FP current, FP target, ref FP currentVelocity, FP smoothTime)
+        {
+            FP deltaTime = FP.EN2;
+            FP positiveInfinity = -FP.MaxValue;
+            return SmoothDamp(current, target, ref currentVelocity, smoothTime, positiveInfinity, deltaTime);
+        }
+
+        public static FP SmoothDamp(FP current, FP target, ref FP currentVelocity, FP smoothTime, FP maxSpeed, FP deltaTime)
+        {
+            smoothTime = Max(FP.EN4, smoothTime);
+            FP num = (FP)2f / smoothTime;
+            FP num2 = num * deltaTime;
+            FP num3 = FP.One / (((FP.One + num2) + (((FP)0.48f * num2) * num2)) + ((((FP)0.235f * num2) * num2) * num2));
+            FP num4 = current - target;
+            FP num5 = target;
+            FP max = maxSpeed * smoothTime;
+            num4 = Clamp(num4, -max, max);
+            target = current - num4;
+            FP num7 = (currentVelocity + (num * num4)) * deltaTime;
+            currentVelocity = (currentVelocity - (num * num7)) * num3;
+            FP num8 = target + ((num4 + num7) * num3);
+            if (((num5 - current) > FP.Zero) == (num8 > num5))
+            {
+                num8 = num5;
+                currentVelocity = (num8 - num5) / deltaTime;
+            }
+            return num8;
         }
     }
 }
