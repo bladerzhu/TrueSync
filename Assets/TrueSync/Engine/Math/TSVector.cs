@@ -437,17 +437,38 @@ namespace TrueSync
         }
         #endregion
 
-        /// <summary>
-        /// Calculates the projection of two vectors.
-        /// </summary>
-        /// <param name="vector1">The first vector.</param>
-        /// <param name="vector2">The second vector.</param>
-        /// <returns>The projection of first vector to the second vector.</returns>
-        public static TSVector Project(TSVector vector1, TSVector vector2)
+        // Projects a vector onto another vector.
+        public static TSVector Project(TSVector vector, TSVector onNormal)
         {
-            TSVector result;
-            result = TSVector.Dot(vector1, vector2) * vector2;
-            return result;
+            FP sqrtMag = Dot(onNormal, onNormal);
+            if (sqrtMag < TSMath.Epsilon)
+                return zero;
+            else
+                return onNormal * Dot(vector, onNormal) / sqrtMag;
+        }
+
+        // Projects a vector onto a plane defined by a normal orthogonal to the plane.
+        public static TSVector ProjectOnPlane(TSVector vector, TSVector planeNormal)
+        {
+            return vector - Project(vector, planeNormal);
+        }
+
+
+        // Returns the angle in degrees between /from/ and /to/. This is always the smallest
+        public static FP Angle(TSVector from, TSVector to)
+        {
+            return TSMath.Acos(TSMath.Clamp(Dot(from.normalized, to.normalized), -FP.ONE, FP.ONE)) * TSMath.Rad2Deg;
+        }
+
+        // The smaller of the two possible angles between the two vectors is returned, therefore the result will never be greater than 180 degrees or smaller than -180 degrees.
+        // If you imagine the from and to vectors as lines on a piece of paper, both originating from the same point, then the /axis/ vector would point up out of the paper.
+        // The measured angle between the two vectors would be positive in a clockwise direction and negative in an anti-clockwise direction.
+        public static FP SignedAngle(TSVector from, TSVector to, TSVector axis)
+        {
+            TSVector fromNorm = from.normalized, toNorm = to.normalized;
+            FP unsignedAngle = TSMath.Acos(TSMath.Clamp(Dot(fromNorm, toNorm), -FP.ONE, FP.ONE)) * TSMath.Rad2Deg;
+            FP sign = TSMath.Sign(Dot(axis, Cross(fromNorm, toNorm)));
+            return unsignedAngle * sign;
         }
 
         /// <summary>
@@ -808,10 +829,6 @@ namespace TrueSync
             TSVector result;
             TSVector.Divide(ref value1, value2, out result);
             return result;
-        }
-
-        public static FP Angle(TSVector a, TSVector b) {
-            return FP.Acos(a.normalized * b.normalized) * FP.Rad2Deg;
         }
 
         public TSVector2 ToTSVector2() {
