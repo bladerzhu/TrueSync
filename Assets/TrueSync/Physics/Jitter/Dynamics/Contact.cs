@@ -223,77 +223,8 @@ namespace TrueSync.Physics3D {
             tangentImpulse = accumulatedTangentImpulse - oldTangentImpulse;
 
             // Apply contact impulse
-            TSVector impulse;
-            impulse.x = normal.x * normalImpulse + tangent.x * tangentImpulse;
-            impulse.y = normal.y * normalImpulse + tangent.y * tangentImpulse;
-            impulse.z = normal.z * normalImpulse + tangent.z * tangentImpulse;
-
-            if (!treatBody1AsStatic)
-            {
-                body1.linearVelocity.x -= (impulse.x * body1.inverseMass);
-                body1.linearVelocity.y -= (impulse.y * body1.inverseMass);
-                body1.linearVelocity.z -= (impulse.z * body1.inverseMass);
-
-                if (!body1IsMassPoint)
-                {
-                    FP num0, num1, num2;
-                    num0 = relativePos1.y * impulse.z - relativePos1.z * impulse.y;
-                    num1 = relativePos1.z * impulse.x - relativePos1.x * impulse.z;
-                    num2 = relativePos1.x * impulse.y - relativePos1.y * impulse.x;
-
-                    FP num3 =
-                        (((num0 * body1.invInertiaWorld.M11) +
-                        (num1 * body1.invInertiaWorld.M21)) +
-                        (num2 * body1.invInertiaWorld.M31));
-                    FP num4 =
-                        (((num0 * body1.invInertiaWorld.M12) +
-                        (num1 * body1.invInertiaWorld.M22)) +
-                        (num2 * body1.invInertiaWorld.M32));
-                    FP num5 =
-                        (((num0 * body1.invInertiaWorld.M13) +
-                        (num1 * body1.invInertiaWorld.M23)) +
-                        (num2 * body1.invInertiaWorld.M33));
-
-                    body1.angularVelocity.x -= num3;
-                    body1.angularVelocity.y -= num4;
-                    body1.angularVelocity.z -= num5;
-                }
-            }
-
-            if (!treatBody2AsStatic)
-            {
-
-                body2.linearVelocity.x += (impulse.x * body2.inverseMass);
-                body2.linearVelocity.y += (impulse.y * body2.inverseMass);
-                body2.linearVelocity.z += (impulse.z * body2.inverseMass);
-
-                if (!body2IsMassPoint)
-                {
-
-                    FP num0, num1, num2;
-                    num0 = relativePos2.y * impulse.z - relativePos2.z * impulse.y;
-                    num1 = relativePos2.z * impulse.x - relativePos2.x * impulse.z;
-                    num2 = relativePos2.x * impulse.y - relativePos2.y * impulse.x;
-
-                    FP num3 =
-                        (((num0 * body2.invInertiaWorld.M11) +
-                        (num1 * body2.invInertiaWorld.M21)) +
-                        (num2 * body2.invInertiaWorld.M31));
-                    FP num4 =
-                        (((num0 * body2.invInertiaWorld.M12) +
-                        (num1 * body2.invInertiaWorld.M22)) +
-                        (num2 * body2.invInertiaWorld.M32));
-                    FP num5 =
-                        (((num0 * body2.invInertiaWorld.M13) +
-                        (num1 * body2.invInertiaWorld.M23)) +
-                        (num2 * body2.invInertiaWorld.M33));
-
-                    body2.angularVelocity.x += num3;
-                    body2.angularVelocity.y += num4;
-                    body2.angularVelocity.z += num5;
-
-                }
-            }
+            TSVector impulse = normal * normalImpulse + tangent * tangentImpulse;
+            ApplyImpulse(ref impulse);
 
         }
 
@@ -477,16 +408,7 @@ namespace TrueSync.Physics3D {
         /// <param name="timestep">The timestep of the simulation.</param>
         public void PrepareForIteration(FP timestep)
         {
-            FP dvx, dvy, dvz;
-
-            dvx = (body2.angularVelocity.y * relativePos2.z) - (body2.angularVelocity.z * relativePos2.y) + body2.linearVelocity.x;
-            dvy = (body2.angularVelocity.z * relativePos2.x) - (body2.angularVelocity.x * relativePos2.z) + body2.linearVelocity.y;
-            dvz = (body2.angularVelocity.x * relativePos2.y) - (body2.angularVelocity.y * relativePos2.x) + body2.linearVelocity.z;
-
-            dvx = dvx - (body1.angularVelocity.y * relativePos1.z) + (body1.angularVelocity.z * relativePos1.y) - body1.linearVelocity.x;
-            dvy = dvy - (body1.angularVelocity.z * relativePos1.x) + (body1.angularVelocity.x * relativePos1.z) - body1.linearVelocity.y;
-            dvz = dvz - (body1.angularVelocity.x * relativePos1.y) + (body1.angularVelocity.y * relativePos1.x) - body1.linearVelocity.z;
-
+            TSVector dv = CalculateRelativeVelocity();
             FP kNormal = FP.Zero;
 
             TSVector rantra = TSVector.zero;
@@ -496,25 +418,9 @@ namespace TrueSync.Physics3D {
 
                 if (!body1IsMassPoint)
                 {
-
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
-                    rantra.x = (relativePos1.y * normal.z) - (relativePos1.z * normal.y);
-                    rantra.y = (relativePos1.z * normal.x) - (relativePos1.x * normal.z);
-                    rantra.z = (relativePos1.x * normal.y) - (relativePos1.y * normal.x);
-
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
-                    FP num0 = ((rantra.x * body1.invInertiaWorld.M11) + (rantra.y * body1.invInertiaWorld.M21)) + (rantra.z * body1.invInertiaWorld.M31);
-                    FP num1 = ((rantra.x * body1.invInertiaWorld.M12) + (rantra.y * body1.invInertiaWorld.M22)) + (rantra.z * body1.invInertiaWorld.M32);
-                    FP num2 = ((rantra.x * body1.invInertiaWorld.M13) + (rantra.y * body1.invInertiaWorld.M23)) + (rantra.z * body1.invInertiaWorld.M33);
-
-                    rantra.x = num0; rantra.y = num1; rantra.z = num2;
-
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
-                    num0 = (rantra.y * relativePos1.z) - (rantra.z * relativePos1.y);
-                    num1 = (rantra.z * relativePos1.x) - (rantra.x * relativePos1.z);
-                    num2 = (rantra.x * relativePos1.y) - (rantra.y * relativePos1.x);
-
-                    rantra.x = num0; rantra.y = num1; rantra.z = num2;
+                    TSVector.Cross(ref relativePos1, ref normal, out rantra);
+                    TSVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    TSVector.Cross(ref rantra, ref relativePos1, out rantra);
                 }
             }
 
@@ -525,48 +431,22 @@ namespace TrueSync.Physics3D {
 
                 if (!body2IsMassPoint)
                 {
-
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
-                    rbntrb.x = (relativePos2.y * normal.z) - (relativePos2.z * normal.y);
-                    rbntrb.y = (relativePos2.z * normal.x) - (relativePos2.x * normal.z);
-                    rbntrb.z = (relativePos2.x * normal.y) - (relativePos2.y * normal.x);
-
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
-                    FP num0 = ((rbntrb.x * body2.invInertiaWorld.M11) + (rbntrb.y * body2.invInertiaWorld.M21)) + (rbntrb.z * body2.invInertiaWorld.M31);
-                    FP num1 = ((rbntrb.x * body2.invInertiaWorld.M12) + (rbntrb.y * body2.invInertiaWorld.M22)) + (rbntrb.z * body2.invInertiaWorld.M32);
-                    FP num2 = ((rbntrb.x * body2.invInertiaWorld.M13) + (rbntrb.y * body2.invInertiaWorld.M23)) + (rbntrb.z * body2.invInertiaWorld.M33);
-
-                    rbntrb.x = num0; rbntrb.y = num1; rbntrb.z = num2;
-
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
-                    num0 = (rbntrb.y * relativePos2.z) - (rbntrb.z * relativePos2.y);
-                    num1 = (rbntrb.z * relativePos2.x) - (rbntrb.x * relativePos2.z);
-                    num2 = (rbntrb.x * relativePos2.y) - (rbntrb.y * relativePos2.x);
-
-                    rbntrb.x = num0; rbntrb.y = num1; rbntrb.z = num2;
+                    TSVector.Cross(ref relativePos2, ref normal, out rbntrb);
+                    TSVector.Transform(ref rbntrb, ref body2.invInertiaWorld, out rbntrb);
+                    TSVector.Cross(ref rbntrb, ref relativePos2, out rbntrb);
                 }
             }
 
-            if (!treatBody1AsStatic) kNormal += rantra.x * normal.x + rantra.y * normal.y + rantra.z * normal.z;
-            if (!treatBody2AsStatic) kNormal += rbntrb.x * normal.x + rbntrb.y * normal.y + rbntrb.z * normal.z;
+            if (!treatBody1AsStatic)
+                kNormal += TSVector.Dot(ref rantra, ref normal);
+
+            if (!treatBody2AsStatic)
+                kNormal += TSVector.Dot(ref rbntrb, ref normal);
 
             massNormal = FP.One / kNormal;
 
-            FP num = dvx * normal.x + dvy * normal.y + dvz * normal.z;
-
-            tangent.x = dvx - normal.x * num;
-            tangent.y = dvy - normal.y * num;
-            tangent.z = dvz - normal.z * num;
-
-            num = tangent.x * tangent.x + tangent.y * tangent.y + tangent.z * tangent.z;
-
-            if (num != FP.Zero)
-            {
-                num = FP.Sqrt(num);
-                tangent.x /= num;
-                tangent.y /= num;
-                tangent.z /= num;
-            }
+            tangent = dv - TSVector.Dot(dv, normal) * normal;
+            tangent.Normalize();
 
             FP kTangent = FP.Zero;
 
@@ -577,65 +457,39 @@ namespace TrueSync.Physics3D {
   
                 if (!body1IsMassPoint)
                 {
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
-                    rantra.x = (relativePos1.y * tangent.z) - (relativePos1.z * tangent.y);
-                    rantra.y = (relativePos1.z * tangent.x) - (relativePos1.x * tangent.z);
-                    rantra.z = (relativePos1.x * tangent.y) - (relativePos1.y * tangent.x);
-
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
-                    FP num0 = ((rantra.x * body1.invInertiaWorld.M11) + (rantra.y * body1.invInertiaWorld.M21)) + (rantra.z * body1.invInertiaWorld.M31);
-                    FP num1 = ((rantra.x * body1.invInertiaWorld.M12) + (rantra.y * body1.invInertiaWorld.M22)) + (rantra.z * body1.invInertiaWorld.M32);
-                    FP num2 = ((rantra.x * body1.invInertiaWorld.M13) + (rantra.y * body1.invInertiaWorld.M23)) + (rantra.z * body1.invInertiaWorld.M33);
-
-                    rantra.x = num0; rantra.y = num1; rantra.z = num2;
-
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
-                    num0 = (rantra.y * relativePos1.z) - (rantra.z * relativePos1.y);
-                    num1 = (rantra.z * relativePos1.x) - (rantra.x * relativePos1.z);
-                    num2 = (rantra.x * relativePos1.y) - (rantra.y * relativePos1.x);
-
-                    rantra.x = num0; rantra.y = num1; rantra.z = num2;
+                    TSVector.Cross(ref relativePos1, ref normal, out rantra);
+                    TSVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
+                    TSVector.Cross(ref rantra, ref relativePos1, out rantra);
                 }
 
             }
 
-            if (treatBody2AsStatic) rbntrb.MakeZero();
+            if (treatBody2AsStatic)
+                rbntrb.MakeZero();
             else
             {
                 kTangent += body2.inverseMass;
 
                 if (!body2IsMassPoint)
                 {
-                    // JVector.Cross(ref relativePos1, ref normal, out rantra);
-                    rbntrb.x = (relativePos2.y * tangent.z) - (relativePos2.z * tangent.y);
-                    rbntrb.y = (relativePos2.z * tangent.x) - (relativePos2.x * tangent.z);
-                    rbntrb.z = (relativePos2.x * tangent.y) - (relativePos2.y * tangent.x);
-
-                    // JVector.Transform(ref rantra, ref body1.invInertiaWorld, out rantra);
-                    FP num0 = ((rbntrb.x * body2.invInertiaWorld.M11) + (rbntrb.y * body2.invInertiaWorld.M21)) + (rbntrb.z * body2.invInertiaWorld.M31);
-                    FP num1 = ((rbntrb.x * body2.invInertiaWorld.M12) + (rbntrb.y * body2.invInertiaWorld.M22)) + (rbntrb.z * body2.invInertiaWorld.M32);
-                    FP num2 = ((rbntrb.x * body2.invInertiaWorld.M13) + (rbntrb.y * body2.invInertiaWorld.M23)) + (rbntrb.z * body2.invInertiaWorld.M33);
-
-                    rbntrb.x = num0; rbntrb.y = num1; rbntrb.z = num2;
-
-                    //JVector.Cross(ref rantra, ref relativePos1, out rantra);
-                    num0 = (rbntrb.y * relativePos2.z) - (rbntrb.z * relativePos2.y);
-                    num1 = (rbntrb.z * relativePos2.x) - (rbntrb.x * relativePos2.z);
-                    num2 = (rbntrb.x * relativePos2.y) - (rbntrb.y * relativePos2.x);
-
-                    rbntrb.x = num0; rbntrb.y = num1; rbntrb.z = num2;
+                    TSVector.Cross(ref relativePos2, ref tangent, out rbntrb);
+                    TSVector.Transform(ref rbntrb, ref body2.invInertiaWorld, out rbntrb);
+                    TSVector.Cross(ref rbntrb, ref relativePos2, out rbntrb);
                 }
             }
 
-            if (!treatBody1AsStatic) kTangent += TSVector.Dot(ref rantra, ref tangent);
-            if (!treatBody2AsStatic) kTangent += TSVector.Dot(ref rbntrb, ref tangent);
+            if (!treatBody1AsStatic)
+                kTangent += TSVector.Dot(ref rantra, ref tangent);
+            if (!treatBody2AsStatic)
+                kTangent += TSVector.Dot(ref rbntrb, ref tangent);
+
             massTangent = FP.One / kTangent;
 
             restitutionBias = lostSpeculativeBounce;
 
             speculativeVelocity = FP.Zero;
 
-            FP relNormalVel = normal.x * dvx + normal.y * dvy + normal.z * dvz; //JVector.Dot(ref normal, ref dv);
+            FP relNormalVel = TSVector.Dot(ref normal, ref dv);
 
             if (Penetration > settings.allowedPenetration)
             {
@@ -651,12 +505,14 @@ namespace TrueSync.Physics3D {
 
             {
                 // Static/Dynamic friction
-                FP relTangentVel = -(tangent.x * dvx + tangent.y * dvy + tangent.z * dvz);
+                FP relTangentVel = -TSVector.Dot(ref tangent, ref dv);
                 FP tangentImpulse = massTangent * relTangentVel;
                 FP maxTangentImpulse = -staticFriction * accumulatedNormalImpulse;
 
-                if (tangentImpulse < maxTangentImpulse) friction = dynamicFriction;
-                else friction = staticFriction;
+                if (tangentImpulse < maxTangentImpulse)
+                    friction = dynamicFriction;
+                else
+                    friction = staticFriction;
             }
 
             TSVector impulse;
@@ -664,12 +520,10 @@ namespace TrueSync.Physics3D {
             // Simultaneos solving and restitution is simply not possible
             // so fake it a bit by just applying restitution impulse when there
             // is a new contact.
-            /*if (relNormalVel < -FP.One && newContact)
+            if (relNormalVel < -FP.One && newContact)
             {
                 restitutionBias = TSMath.Max(-restitution * relNormalVel, restitutionBias);
-            }*/
-
-            restitutionBias = TSMath.Max(-restitution * relNormalVel, restitutionBias);
+            }
 
             // Speculative Contacts!
             // if the penetration is negative (which means the bodies are not already in contact, but they will
@@ -687,76 +541,8 @@ namespace TrueSync.Physics3D {
                 lostSpeculativeBounce = FP.Zero;
             }
 
-            impulse.x = normal.x * accumulatedNormalImpulse + tangent.x * accumulatedTangentImpulse;
-            impulse.y = normal.y * accumulatedNormalImpulse + tangent.y * accumulatedTangentImpulse;
-            impulse.z = normal.z * accumulatedNormalImpulse + tangent.z * accumulatedTangentImpulse;
-
-            if (!treatBody1AsStatic)
-            {
-                body1.linearVelocity.x -= (impulse.x * body1.inverseMass);
-                body1.linearVelocity.y -= (impulse.y * body1.inverseMass);
-                body1.linearVelocity.z -= (impulse.z * body1.inverseMass);
-
-                if (!body1IsMassPoint)
-                {
-                    FP num0, num1, num2;
-                    num0 = relativePos1.y * impulse.z - relativePos1.z * impulse.y;
-                    num1 = relativePos1.z * impulse.x - relativePos1.x * impulse.z;
-                    num2 = relativePos1.x * impulse.y - relativePos1.y * impulse.x;
-
-                    FP num3 =
-                        (((num0 * body1.invInertiaWorld.M11) +
-                        (num1 * body1.invInertiaWorld.M21)) +
-                        (num2 * body1.invInertiaWorld.M31));
-                    FP num4 =
-                        (((num0 * body1.invInertiaWorld.M12) +
-                        (num1 * body1.invInertiaWorld.M22)) +
-                        (num2 * body1.invInertiaWorld.M32));
-                    FP num5 =
-                        (((num0 * body1.invInertiaWorld.M13) +
-                        (num1 * body1.invInertiaWorld.M23)) +
-                        (num2 * body1.invInertiaWorld.M33));
-
-                    body1.angularVelocity.x -= num3;
-                    body1.angularVelocity.y -= num4;
-                    body1.angularVelocity.z -= num5;
-
-                }
-            }
-
-            if (!treatBody2AsStatic)
-            {
-
-                body2.linearVelocity.x += (impulse.x * body2.inverseMass);
-                body2.linearVelocity.y += (impulse.y * body2.inverseMass);
-                body2.linearVelocity.z += (impulse.z * body2.inverseMass);
-
-                if (!body2IsMassPoint)
-                {
-
-                    FP num0, num1, num2;
-                    num0 = relativePos2.y * impulse.z - relativePos2.z * impulse.y;
-                    num1 = relativePos2.z * impulse.x - relativePos2.x * impulse.z;
-                    num2 = relativePos2.x * impulse.y - relativePos2.y * impulse.x;
-
-                    FP num3 =
-                        (((num0 * body2.invInertiaWorld.M11) +
-                        (num1 * body2.invInertiaWorld.M21)) +
-                        (num2 * body2.invInertiaWorld.M31));
-                    FP num4 =
-                        (((num0 * body2.invInertiaWorld.M12) +
-                        (num1 * body2.invInertiaWorld.M22)) +
-                        (num2 * body2.invInertiaWorld.M32));
-                    FP num5 =
-                        (((num0 * body2.invInertiaWorld.M13) +
-                        (num1 * body2.invInertiaWorld.M23)) +
-                        (num2 * body2.invInertiaWorld.M33));
-
-                    body2.angularVelocity.x += num3;
-                    body2.angularVelocity.y += num4;
-                    body2.angularVelocity.z += num5;
-                }
-            }
+            impulse = normal * accumulatedNormalImpulse + tangent * accumulatedTangentImpulse;
+            ApplyImpulse(ref impulse);
 
             lastTimeStep = timestep;
 
