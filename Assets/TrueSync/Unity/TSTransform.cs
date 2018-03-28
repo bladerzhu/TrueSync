@@ -289,6 +289,30 @@ namespace TrueSync {
             }
         }
 
+
+        public TSMatrix LocalToWorldMatrix
+        {
+            get
+            {
+                TSMatrix curMatrix = TSMatrix.CreateFromQuaternion(rotation);
+                TSTransform curParent = tsParent;
+                while (curParent != null)
+                {
+                    curMatrix *= TSMatrix.CreateFromQuaternion(curParent.rotation);
+                    curParent = curParent.tsParent;
+                }
+                return curMatrix;
+            }
+        }
+
+        public TSMatrix WorldToLocalMatrix
+        {
+            get
+            {
+                return TSMatrix.Inverse(LocalToWorldMatrix);
+            }
+        }
+
         /**
          *  @brief Transform a point from local space to world space.
          **/
