@@ -289,99 +289,106 @@ namespace TrueSync {
             }
         }
 
-
-        public TSMatrix4x4 LocalToWorldMatrix
+        public TSMatrix4x4 localToWorldMatrix
         {
             get
             {
-                TSMatrix4x4 curMatrix = TSMatrix4x4.CreateFromQuaternion(rotation);
-                TSTransform curParent = tsParent;
-                while (curParent != null)
-                {
-                    curMatrix *= TSMatrix4x4.CreateFromQuaternion(curParent.rotation);
-                    curParent = curParent.tsParent;
-                }
+                TSTransform thisTransform = this;
+                TSMatrix4x4 curMatrix = TSMatrix4x4.TransformToMatrix(ref thisTransform);
                 return curMatrix;
             }
         }
 
-        public TSMatrix4x4 WorldToLocalMatrix
+        public TSMatrix4x4 worldToLocalMatrix
         {
             get
             {
-                return TSMatrix4x4.Inverse(LocalToWorldMatrix);
+                return TSMatrix4x4.Inverse(localToWorldMatrix);
             }
         }
 
         /**
          *  @brief Transform a point from local space to world space.
          **/
+        public TSVector4 TransformPoint(TSVector4 point)
+        {
+            Debug.Assert(point.w == FP.One);
+            return TSVector4.Transform(point, localToWorldMatrix);
+        }
+
         public TSVector TransformPoint(TSVector point)
         {
-            TSVector result = TSVector.Transform(point, TSMatrix.CreateFromQuaternion(rotation));
-            result.x *= scale.x;
-            result.y *= scale.y;
-            result.z *= scale.z;
-            return result + this.position;
+            return TransformPoint(point.ToTSVector4()).ToTSVector();
         }
 
         /**
          *  @brief Transform a point from world space to local space.
          **/
+        public TSVector4 InverseTransformPoint(TSVector4 point)
+        {
+            Debug.Assert(point.w == FP.One);
+            return TSVector4.Transform(point, worldToLocalMatrix);
+        }
+
         public TSVector InverseTransformPoint(TSVector point)
         {
-            point -= this.position;
-            point.x /= scale.x;
-            point.y /= scale.y;
-            point.z /= scale.z;
-            TSMatrix m = TSMatrix.CreateFromQuaternion(rotation);
-            m = TSMatrix.Inverse(m);
-            TSVector result = TSVector.Transform(point, m);
-            return result;
+            return TSVector4.Transform(point, worldToLocalMatrix).ToTSVector();
         }
 
         /**
          *  @brief Transform a direction from local space to world space.
          **/
+        public TSVector4 TransformDirection(TSVector4 direction)
+        {
+            Debug.Assert(direction.w == FP.Zero);
+            return TSVector4.Normalize(TSVector4.Transform(direction, localToWorldMatrix));
+        }
+
         public TSVector TransformDirection(TSVector direction)
         {
-            return TSVector.Transform(direction, TSMatrix.CreateFromQuaternion(rotation));
+            return TSVector.Normalize(TransformDirection(new TSVector4(direction.x, direction.y, direction.z, FP.Zero)).ToTSVector());
         }
 
         /**
          *  @brief Transform a direction from world space to local space.
          **/
+        public TSVector4 InverseTransformDirection(TSVector4 direction)
+        {
+            Debug.Assert(direction.w == FP.Zero);
+            return TSVector4.Normalize(TSVector4.Transform(direction, worldToLocalMatrix));
+        }
+
         public TSVector InverseTransformDirection(TSVector direction)
         {
-            TSMatrix m = TSMatrix.CreateFromQuaternion(rotation);
-            m = TSMatrix.Inverse(m);
-            return TSVector.Transform(direction, m);
+            return TSVector.Normalize(InverseTransformDirection(new TSVector4(direction.x, direction.y, direction.z, FP.Zero)).ToTSVector());
         }
 
         /**
          *  @brief Transform a vector from local space to world space.
          **/
+        public TSVector4 TransformVector(TSVector4 vector)
+        {
+            Debug.Assert(vector.w == FP.Zero);
+            return TSVector4.Transform(vector, localToWorldMatrix);
+        }
+
         public TSVector TransformVector(TSVector vector)
         {
-            TSVector result = TSVector.Transform(vector, TSMatrix.CreateFromQuaternion(rotation));
-            result.x *= scale.x;
-            result.y *= scale.y;
-            result.z *= scale.z;
-            return result;
+            return TransformVector(new TSVector4(vector.x, vector.y, vector.z, FP.Zero)).ToTSVector();
         }
 
         /**
          *  @brief Transform a vector from world space to local space.
          **/
+        public TSVector4 InverseTransformVector(TSVector4 vector)
+        {
+            Debug.Assert(vector.w == FP.Zero);
+            return TSVector4.Transform(vector, worldToLocalMatrix);
+        }
+
         public TSVector InverseTransformVector(TSVector vector)
         {
-            vector.x /= scale.x;
-            vector.y /= scale.y;
-            vector.z /= scale.z;
-            TSMatrix m = TSMatrix.CreateFromQuaternion(rotation);
-            m = TSMatrix.Inverse(m);
-            TSVector result = TSVector.Transform(vector, m);
-            return result;
+            return InverseTransformVector(new TSVector4(vector.x, vector.y, vector.z, FP.Zero)).ToTSVector();
         }
 
         [HideInInspector]

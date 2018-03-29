@@ -173,25 +173,29 @@ namespace TrueSync
         /// <param name="result">The product of both matrices.</param>
         public static void Multiply(ref TSMatrix4x4 matrix1, ref TSMatrix4x4 matrix2, out TSMatrix4x4 result)
         {
-            result.M11 = ((matrix1.M11 * matrix2.M11) + (matrix1.M12 * matrix2.M21)) + (matrix1.M13 * matrix2.M31) + (matrix1.M14 * matrix2.M41);
-            result.M12 = ((matrix1.M11 * matrix2.M12) + (matrix1.M12 * matrix2.M22)) + (matrix1.M13 * matrix2.M32) + (matrix1.M14 * matrix2.M42);
-            result.M13 = ((matrix1.M11 * matrix2.M13) + (matrix1.M12 * matrix2.M23)) + (matrix1.M13 * matrix2.M33) + (matrix1.M14 * matrix2.M43);
-            result.M14 = ((matrix1.M11 * matrix2.M14) + (matrix1.M12 * matrix2.M24)) + (matrix1.M13 * matrix2.M34) + (matrix1.M14 * matrix2.M44);
-            
-            result.M21 = ((matrix1.M21 * matrix2.M11) + (matrix1.M22 * matrix2.M21)) + (matrix1.M23 * matrix2.M31) + (matrix1.M24 * matrix2.M41);
-            result.M22 = ((matrix1.M21 * matrix2.M12) + (matrix1.M22 * matrix2.M22)) + (matrix1.M23 * matrix2.M32) + (matrix1.M24 * matrix2.M42);
-            result.M23 = ((matrix1.M21 * matrix2.M13) + (matrix1.M22 * matrix2.M23)) + (matrix1.M23 * matrix2.M33) + (matrix1.M24 * matrix2.M43);
-            result.M24 = ((matrix1.M21 * matrix2.M14) + (matrix1.M22 * matrix2.M24)) + (matrix1.M23 * matrix2.M33) + (matrix1.M24 * matrix2.M44);
+            // First row
+            result.M11 = matrix1.M11 * matrix2.M11 + matrix1.M12 * matrix2.M21 + matrix1.M13 * matrix2.M31 + matrix1.M14 * matrix2.M41;
+            result.M12 = matrix1.M11 * matrix2.M12 + matrix1.M12 * matrix2.M22 + matrix1.M13 * matrix2.M32 + matrix1.M14 * matrix2.M42;
+            result.M13 = matrix1.M11 * matrix2.M13 + matrix1.M12 * matrix2.M23 + matrix1.M13 * matrix2.M33 + matrix1.M14 * matrix2.M43;
+            result.M14 = matrix1.M11 * matrix2.M14 + matrix1.M12 * matrix2.M24 + matrix1.M13 * matrix2.M34 + matrix1.M14 * matrix2.M44;
 
-            result.M31 =  ((matrix1.M31 * matrix2.M11) + (matrix1.M32 * matrix2.M21)) + (matrix1.M33 * matrix2.M31) + (matrix1.M34 * matrix2.M41);
-            result.M32 =  ((matrix1.M31 * matrix2.M12) + (matrix1.M32 * matrix2.M22)) + (matrix1.M33 * matrix2.M32) + (matrix1.M34 * matrix2.M42);
-            result.M33 = ((matrix1.M31 * matrix2.M13) + (matrix1.M32 * matrix2.M23)) + (matrix1.M33 * matrix2.M33) + (matrix1.M34 * matrix2.M43);
-            result.M34 = ((matrix1.M31 * matrix2.M14) + (matrix1.M32 * matrix2.M24)) + (matrix1.M33 * matrix2.M34) + (matrix1.M34 * matrix2.M44);
+            // Second row
+            result.M21 = matrix1.M21 * matrix2.M11 + matrix1.M22 * matrix2.M21 + matrix1.M23 * matrix2.M31 + matrix1.M24 * matrix2.M41;
+            result.M22 = matrix1.M21 * matrix2.M12 + matrix1.M22 * matrix2.M22 + matrix1.M23 * matrix2.M32 + matrix1.M24 * matrix2.M42;
+            result.M23 = matrix1.M21 * matrix2.M13 + matrix1.M22 * matrix2.M23 + matrix1.M23 * matrix2.M33 + matrix1.M24 * matrix2.M43;
+            result.M24 = matrix1.M21 * matrix2.M14 + matrix1.M22 * matrix2.M24 + matrix1.M23 * matrix2.M34 + matrix1.M24 * matrix2.M44;
 
-            result.M41 = ((matrix1.M41 * matrix2.M11) + (matrix1.M42 * matrix2.M21)) + (matrix1.M43 * matrix2.M31) + (matrix1.M44 * matrix2.M41);
-            result.M42 = ((matrix1.M41 * matrix2.M12) + (matrix1.M42 * matrix2.M22)) + (matrix1.M43 * matrix2.M32) + (matrix1.M44 * matrix2.M42);
-            result.M43 = ((matrix1.M41 * matrix2.M13) + (matrix1.M42 * matrix2.M23)) + (matrix1.M43 * matrix2.M33) + (matrix1.M44 * matrix2.M43);
-            result.M44 = ((matrix1.M41 * matrix2.M14) + (matrix1.M42 * matrix2.M24)) + (matrix1.M43 * matrix2.M33) + (matrix1.M44 * matrix2.M44);
+            // Third row
+            result.M31 = matrix1.M31 * matrix2.M11 + matrix1.M32 * matrix2.M21 + matrix1.M33 * matrix2.M31 + matrix1.M34 * matrix2.M41;
+            result.M32 = matrix1.M31 * matrix2.M12 + matrix1.M32 * matrix2.M22 + matrix1.M33 * matrix2.M32 + matrix1.M34 * matrix2.M42;
+            result.M33 = matrix1.M31 * matrix2.M13 + matrix1.M32 * matrix2.M23 + matrix1.M33 * matrix2.M33 + matrix1.M34 * matrix2.M43;
+            result.M34 = matrix1.M31 * matrix2.M14 + matrix1.M32 * matrix2.M24 + matrix1.M33 * matrix2.M34 + matrix1.M34 * matrix2.M44;
+
+            // Fourth row
+            result.M41 = matrix1.M41 * matrix2.M11 + matrix1.M42 * matrix2.M21 + matrix1.M43 * matrix2.M31 + matrix1.M44 * matrix2.M41;
+            result.M42 = matrix1.M41 * matrix2.M12 + matrix1.M42 * matrix2.M22 + matrix1.M43 * matrix2.M32 + matrix1.M44 * matrix2.M42;
+            result.M43 = matrix1.M41 * matrix2.M13 + matrix1.M42 * matrix2.M23 + matrix1.M43 * matrix2.M33 + matrix1.M44 * matrix2.M43;
+            result.M44 = matrix1.M41 * matrix2.M14 + matrix1.M42 * matrix2.M24 + matrix1.M43 * matrix2.M34 + matrix1.M44 * matrix2.M44;
         }
 
         /// <summary>
@@ -498,11 +502,11 @@ namespace TrueSync
             FP zz = quaternion.z * quaternion.z;
 
             FP xy = quaternion.x * quaternion.y;
-            FP wz = quaternion.z * quaternion.w;
-            FP xz = quaternion.z * quaternion.x;
-            FP wy = quaternion.y * quaternion.x;
+            FP wz = quaternion.w * quaternion.z;
+            FP xz = quaternion.x * quaternion.z;
+            FP wy = quaternion.w * quaternion.y;
             FP yz = quaternion.y * quaternion.z;
-            FP wx = quaternion.x * quaternion.w;
+            FP wx = quaternion.w * quaternion.x;
 
             result.M11 = FP.One - 2 * (yy + zz);
             result.M12 = 2 * (xy + wz);
@@ -520,6 +524,8 @@ namespace TrueSync
             result.M42 = FP.Zero;
             result.M43 = FP.Zero;
             result.M44 = FP.One;
+
+            result = Inverse(result); // due to unity
         }
 
         /// <summary>
@@ -725,29 +731,34 @@ namespace TrueSync
         /// <param name="yPosition">The amount to translate on the Y-axis.</param>
         /// <param name="zPosition">The amount to translate on the Z-axis.</param>
         /// <returns>The translation matrix.</returns>
-        public static TSMatrix4x4 CreateTranslation(float xPosition, float yPosition, float zPosition)
+        public static TSMatrix4x4 CreateFromTranslation(FP xPosition, FP yPosition, FP zPosition)
         {
             TSMatrix4x4 result;
 
-            result.M11 = 1.0f;
-            result.M12 = 0.0f;
-            result.M13 = 0.0f;
-            result.M14 = 0.0f;
-            result.M21 = 0.0f;
-            result.M22 = 1.0f;
-            result.M23 = 0.0f;
-            result.M24 = 0.0f;
-            result.M31 = 0.0f;
-            result.M32 = 0.0f;
-            result.M33 = 1.0f;
-            result.M34 = 0.0f;
+            result.M11 = FP.One;
+            result.M12 = FP.Zero;
+            result.M13 = FP.Zero;
+            result.M14 = FP.Zero;
+            result.M21 = FP.Zero;
+            result.M22 = FP.One;
+            result.M23 = FP.Zero;
+            result.M24 = FP.Zero;
+            result.M31 = FP.Zero;
+            result.M32 = FP.Zero;
+            result.M33 = FP.One;
+            result.M34 = FP.Zero;
 
             result.M41 = xPosition;
             result.M42 = yPosition;
             result.M43 = zPosition;
-            result.M44 = 1.0f;
+            result.M44 = FP.One;
 
             return result;
+        }
+
+        public static TSMatrix4x4 CreateFromTranslation(TSVector translation)
+        {
+            return CreateFromTranslation(translation.x, translation.y, translation.z);
         }
 
         /// <summary>
@@ -757,7 +768,7 @@ namespace TrueSync
         /// <param name="yScale">Value to scale by on the Y-axis.</param>
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateScale(FP xScale, FP yScale, FP zScale)
+        public static TSMatrix4x4 CreateFromScale(FP xScale, FP yScale, FP zScale)
         {
             TSMatrix4x4 result;
 
@@ -789,7 +800,7 @@ namespace TrueSync
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateScale(FP xScale, FP yScale, FP zScale, TSVector centerPoint)
+        public static TSMatrix4x4 CreateFromScale(FP xScale, FP yScale, FP zScale, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -822,9 +833,9 @@ namespace TrueSync
         /// </summary>
         /// <param name="scales">The vector containing the amount to scale by on each axis.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateScale(TSVector scales)
+        public static TSMatrix4x4 CreateFromScale(TSVector scales)
         {
-            return CreateScale(scales.x, scales.y, scales.z);
+            return CreateFromScale(scales.x, scales.y, scales.z);
         }
 
         /// <summary>
@@ -833,9 +844,9 @@ namespace TrueSync
         /// <param name="scales">The vector containing the amount to scale by on each axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateScale(TSVector scales, TSVector centerPoint)
+        public static TSMatrix4x4 CreateFromScale(TSVector scales, TSVector centerPoint)
         {
-            return CreateScale(scales.x, scales.y, scales.z, centerPoint);
+            return CreateFromScale(scales.x, scales.y, scales.z, centerPoint);
         }
 
         /// <summary>
@@ -843,9 +854,9 @@ namespace TrueSync
         /// </summary>
         /// <param name="scale">The uniform scaling factor.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateScale(FP scale)
+        public static TSMatrix4x4 CreateFromScale(FP scale)
         {
-            return CreateScale(scale, scale, scale);
+            return CreateFromScale(scale, scale, scale);
         }
 
         /// <summary>
@@ -854,9 +865,9 @@ namespace TrueSync
         /// <param name="scale">The uniform scaling factor.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateScale(FP scale, TSVector centerPoint)
+        public static TSMatrix4x4 CreateFromScale(FP scale, TSVector centerPoint)
         {
-            return CreateScale(scale, scale, scale, centerPoint);
+            return CreateFromScale(scale, scale, scale, centerPoint);
         }
 
         /// <summary>
@@ -864,7 +875,7 @@ namespace TrueSync
         /// </summary>
         /// <param name="radians">The amount, in radians, by which to rotate around the X-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateRotationX(FP radians)
+        public static TSMatrix4x4 CreateFromRotationX(FP radians)
         {
             TSMatrix4x4 result;
 
@@ -901,7 +912,7 @@ namespace TrueSync
         /// <param name="radians">The amount, in radians, by which to rotate around the X-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateRotationX(FP radians, TSVector centerPoint)
+        public static TSMatrix4x4 CreateFromRotationX(FP radians, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -940,7 +951,7 @@ namespace TrueSync
         /// </summary>
         /// <param name="radians">The amount, in radians, by which to rotate around the Y-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateRotationY(FP radians)
+        public static TSMatrix4x4 CreateFromRotationY(FP radians)
         {
             TSMatrix4x4 result;
 
@@ -977,7 +988,7 @@ namespace TrueSync
         /// <param name="radians">The amount, in radians, by which to rotate around the Y-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateRotationY(float radians, TSVector centerPoint)
+        public static TSMatrix4x4 CreateFromRotationY(FP radians, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -1016,7 +1027,7 @@ namespace TrueSync
         /// </summary>
         /// <param name="radians">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateRotationZ(FP radians)
+        public static TSMatrix4x4 CreateFromRotationZ(FP radians)
         {
             TSMatrix4x4 result;
 
@@ -1053,7 +1064,7 @@ namespace TrueSync
         /// <param name="radians">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateRotationZ(FP radians, TSVector centerPoint)
+        public static TSMatrix4x4 CreateFromRotationZ(FP radians, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -1163,6 +1174,25 @@ namespace TrueSync
                 M21.RawValue, M22.RawValue, M23.RawValue, M24.RawValue,
                 M31.RawValue, M32.RawValue, M33.RawValue, M34.RawValue,
                 M41.RawValue, M42.RawValue, M43.RawValue, M44.RawValue);
+        }
+
+        public static void TRS(TSVector translation, TSQuaternion rotation, TSVector scale, out TSMatrix4x4 matrix)
+        {
+            TSMatrix4x4 scaleMatrix = TSMatrix4x4.CreateFromScale(scale);
+            UnityEngine.Matrix4x4 scaleMatrix1 = UnityEngine.Matrix4x4.Scale(scale.ToVector());
+            TSMatrix4x4 rotationMatrix = CreateFromQuaternion(rotation);
+            UnityEngine.Matrix4x4 rotationMatrix1 = UnityEngine.Matrix4x4.Rotate(rotation.ToQuaternion());
+            TSMatrix4x4 translationMatrix = CreateFromTranslation(translation);
+            UnityEngine.Matrix4x4 translationMatrix1 = UnityEngine.Matrix4x4.Translate(translation.ToVector());
+
+            matrix = TSMatrix4x4.CreateFromScale(scale) * TSMatrix4x4.CreateFromQuaternion(rotation) * TSMatrix4x4.CreateFromTranslation(translation);
+        }
+
+        public static TSMatrix4x4 TransformToMatrix(ref TSTransform transform)
+        {
+            TSMatrix4x4 result;
+            TRS(transform.position, transform.rotation, transform.scale, out result);
+            return result;
         }
 
     }

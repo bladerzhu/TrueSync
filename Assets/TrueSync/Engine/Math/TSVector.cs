@@ -835,6 +835,11 @@ namespace TrueSync
             return new TSVector2(this.x, this.y);
         }
 
+        public TSVector4 ToTSVector4()
+        {
+            return new TSVector4(this.x, this.y, this.z, FP.One);
+        }
+
     }
 
 }
