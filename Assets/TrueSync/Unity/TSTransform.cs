@@ -290,26 +290,26 @@ namespace TrueSync {
         }
 
 
-        public TSMatrix LocalToWorldMatrix
+        public TSMatrix4x4 LocalToWorldMatrix
         {
             get
             {
-                TSMatrix curMatrix = TSMatrix.CreateFromQuaternion(rotation);
+                TSMatrix4x4 curMatrix = TSMatrix4x4.CreateFromQuaternion(rotation);
                 TSTransform curParent = tsParent;
                 while (curParent != null)
                 {
-                    curMatrix *= TSMatrix.CreateFromQuaternion(curParent.rotation);
+                    curMatrix *= TSMatrix4x4.CreateFromQuaternion(curParent.rotation);
                     curParent = curParent.tsParent;
                 }
                 return curMatrix;
             }
         }
 
-        public TSMatrix WorldToLocalMatrix
+        public TSMatrix4x4 WorldToLocalMatrix
         {
             get
             {
-                return TSMatrix.Inverse(LocalToWorldMatrix);
+                return TSMatrix4x4.Inverse(LocalToWorldMatrix);
             }
         }
 
