@@ -402,7 +402,7 @@ namespace TrueSync
                 result = new TSMatrix4x4();
             }
 
-            FP invDet = 1.0f / det;
+            FP invDet = FP.One / det;
 
             result.M11 = a11 * invDet;
             result.M21 = a12 * invDet;
@@ -497,35 +497,37 @@ namespace TrueSync
         /// <param name="result">JMatrix representing an orientation.</param>
         public static void CreateFromQuaternion(ref TSQuaternion quaternion, out TSMatrix4x4 result)
         {
-            FP xx = quaternion.x * quaternion.x;
-            FP yy = quaternion.y * quaternion.y;
-            FP zz = quaternion.z * quaternion.z;
+            // Precalculate coordinate products
+            FP x = quaternion.x * 2;
+            FP y = quaternion.y * 2;
+            FP z = quaternion.z * 2;
+            FP xx = quaternion.x * x;
+            FP yy = quaternion.y * y;
+            FP zz = quaternion.z * z;
+            FP xy = quaternion.x * y;
+            FP xz = quaternion.x * z;
+            FP yz = quaternion.y * z;
+            FP wx = quaternion.w * x;
+            FP wy = quaternion.w * y;
+            FP wz = quaternion.w * z;
 
-            FP xy = quaternion.x * quaternion.y;
-            FP wz = quaternion.w * quaternion.z;
-            FP xz = quaternion.x * quaternion.z;
-            FP wy = quaternion.w * quaternion.y;
-            FP yz = quaternion.y * quaternion.z;
-            FP wx = quaternion.w * quaternion.x;
-
-            result.M11 = FP.One - 2 * (yy + zz);
-            result.M12 = 2 * (xy + wz);
-            result.M13 = 2 * (xz - wy);
-            result.M14 = FP.Zero;
-            result.M21 = 2 * (xy - wz);
-            result.M22 = FP.One - 2 * (zz + xx);
-            result.M23 = 2 * (yz + wx);
-            result.M24 = FP.Zero;
-            result.M31 = 2 * (xz + wy);
-            result.M32 = 2 * (yz - wx);
-            result.M33 = FP.One - 2 * (yy + xx);
-            result.M34 = FP.Zero;
+            // Calculate 3x3 matrix from orthonormal basis
+            result.M11 = FP.One - (yy + zz);
+            result.M21 = xy + wz;
+            result.M31 = xz - wy;
             result.M41 = FP.Zero;
+            result.M12 = xy - wz;
+            result.M22 = FP.One - (xx + zz);
+            result.M32 = yz + wx;
             result.M42 = FP.Zero;
+            result.M13 = xz + wy;
+            result.M23 = yz - wx;
+            result.M33 = FP.One - (xx + yy);
             result.M43 = FP.Zero;
+            result.M14 = FP.Zero;
+            result.M24 = FP.Zero;
+            result.M34 = FP.Zero;
             result.M44 = FP.One;
-
-            result = Inverse(result); // due to unity
         }
 
         /// <summary>
@@ -735,23 +737,10 @@ namespace TrueSync
         {
             TSMatrix4x4 result;
 
-            result.M11 = FP.One;
-            result.M12 = FP.Zero;
-            result.M13 = FP.Zero;
-            result.M14 = FP.Zero;
-            result.M21 = FP.Zero;
-            result.M22 = FP.One;
-            result.M23 = FP.Zero;
-            result.M24 = FP.Zero;
-            result.M31 = FP.Zero;
-            result.M32 = FP.Zero;
-            result.M33 = FP.One;
-            result.M34 = FP.Zero;
-
-            result.M41 = xPosition;
-            result.M42 = yPosition;
-            result.M43 = zPosition;
-            result.M44 = FP.One;
+            result.M11 = FP.One;  result.M12 = FP.Zero; result.M13 = FP.Zero; result.M14 = xPosition;
+            result.M21 = FP.Zero; result.M22 = FP.One;  result.M23 = FP.Zero; result.M24 = yPosition;
+            result.M31 = FP.Zero; result.M32 = FP.Zero; result.M33 = FP.One;  result.M34 = zPosition;
+            result.M41 = FP.Zero; result.M42 = FP.Zero; result.M43 = FP.Zero; result.M44 = FP.One;
 
             return result;
         }
@@ -772,22 +761,10 @@ namespace TrueSync
         {
             TSMatrix4x4 result;
 
-            result.M11 = xScale;
-            result.M12 = FP.Zero;
-            result.M13 = FP.Zero;
-            result.M14 = FP.Zero;
-            result.M21 = FP.Zero;
-            result.M22 = yScale;
-            result.M23 = FP.Zero;
-            result.M24 = FP.Zero;
-            result.M31 = FP.Zero;
-            result.M32 = FP.Zero;
-            result.M33 = zScale;
-            result.M34 = FP.Zero;
-            result.M41 = FP.Zero;
-            result.M42 = FP.Zero;
-            result.M43 = FP.Zero;
-            result.M44 = FP.One;
+            result.M11 = xScale;  result.M12 = FP.Zero; result.M13 = FP.Zero; result.M14 = FP.Zero;
+            result.M21 = FP.Zero; result.M22 = yScale;  result.M23 = FP.Zero; result.M24 = FP.Zero;
+            result.M31 = FP.Zero; result.M32 = FP.Zero; result.M33 = zScale;  result.M34 = FP.Zero;
+            result.M41 = FP.Zero; result.M42 = FP.Zero; result.M43 = FP.Zero; result.M44 = FP.One;
 
             return result;
         }
@@ -808,22 +785,10 @@ namespace TrueSync
             FP ty = centerPoint.y * (FP.One - yScale);
             FP tz = centerPoint.z * (FP.One - zScale);
 
-            result.M11 = xScale;
-            result.M12 = FP.Zero;
-            result.M13 = FP.Zero;
-            result.M14 = FP.Zero;
-            result.M21 = FP.Zero;
-            result.M22 = yScale;
-            result.M23 = FP.Zero;
-            result.M24 = FP.Zero;
-            result.M31 = FP.Zero;
-            result.M32 = FP.Zero;
-            result.M33 = zScale;
-            result.M34 = FP.Zero;
-            result.M41 = tx;
-            result.M42 = ty;
-            result.M43 = tz;
-            result.M44 = FP.One;
+            result.M11 = xScale;  result.M12 = FP.Zero; result.M13 = FP.Zero; result.M14 = FP.Zero;
+            result.M21 = FP.Zero; result.M22 = yScale;  result.M23 = FP.Zero; result.M24 = FP.Zero;
+            result.M31 = FP.Zero; result.M32 = FP.Zero; result.M33 = zScale;  result.M34 = FP.Zero;
+            result.M41 = tx;      result.M42 = ty;      result.M43 = tz;      result.M44 = FP.One;
 
             return result;
         }
@@ -1185,7 +1150,7 @@ namespace TrueSync
             TSMatrix4x4 translationMatrix = CreateFromTranslation(translation);
             UnityEngine.Matrix4x4 translationMatrix1 = UnityEngine.Matrix4x4.Translate(translation.ToVector());
 
-            matrix = TSMatrix4x4.CreateFromScale(scale) * TSMatrix4x4.CreateFromQuaternion(rotation) * TSMatrix4x4.CreateFromTranslation(translation);
+            matrix = TSMatrix4x4.CreateFromTranslation(translation) * TSMatrix4x4.CreateFromQuaternion(rotation) * TSMatrix4x4.CreateFromScale(scale);
         }
 
         public static TSMatrix4x4 TransformToMatrix(ref TSTransform transform)

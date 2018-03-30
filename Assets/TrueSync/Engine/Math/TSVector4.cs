@@ -380,31 +380,23 @@ namespace TrueSync
         /// <summary>
         /// Transforms a vector by the given matrix.
         /// </summary>
-        /// <param name="position">The vector to transform.</param>
+        /// <param name="vector">The vector to transform.</param>
         /// <param name="matrix">The transform matrix.</param>
         /// <param name="result">The transformed vector.</param>
-        public static void Transform(ref TSVector2 position, ref TSMatrix4x4 matrix, out TSVector4 result)
+        public static void Transform(ref TSVector vector, ref TSMatrix4x4 matrix, out TSVector4 result)
         {
-            result.x = position.x * matrix.M11 + position.y * matrix.M21 + matrix.M41;
-            result.y = position.x * matrix.M12 + position.y * matrix.M22 + matrix.M42;
-            result.z = position.x * matrix.M13 + position.y * matrix.M23 + matrix.M43;
-            result.w = position.x * matrix.M14 + position.y * matrix.M24 + matrix.M44;
-        }
-
-        public static void Transform(ref TSVector position, ref TSMatrix4x4 matrix, out TSVector4 result)
-        {
-            result.x = position.x * matrix.M11 + position.y * matrix.M21 + position.z * matrix.M31 + matrix.M41;
-            result.y = position.x * matrix.M12 + position.y * matrix.M22 + position.z * matrix.M32 + matrix.M42;
-            result.z = position.x * matrix.M13 + position.y * matrix.M23 + position.z * matrix.M33 + matrix.M43;
-            result.w = position.x * matrix.M14 + position.y * matrix.M24 + position.z * matrix.M34 + matrix.M44;
+            result.x = vector.x * matrix.M11 + vector.y * matrix.M12 + vector.z * matrix.M13 + matrix.M14;
+            result.y = vector.x * matrix.M21 + vector.y * matrix.M22 + vector.z * matrix.M23 + matrix.M24;
+            result.z = vector.x * matrix.M31 + vector.y * matrix.M32 + vector.z * matrix.M33 + matrix.M34;
+            result.w = vector.x * matrix.M41 + vector.y * matrix.M42 + vector.z * matrix.M43 + matrix.M44;
         }
 
         public static void Transform(ref TSVector4 vector, ref TSMatrix4x4 matrix, out TSVector4 result)
         {
-            result.x = vector.x * matrix.M11 + vector.y * matrix.M21 + vector.z * matrix.M31 + vector.w * matrix.M41;
-            result.y = vector.x * matrix.M12 + vector.y * matrix.M22 + vector.z * matrix.M32 + vector.w * matrix.M42;
-            result.z = vector.x * matrix.M13 + vector.y * matrix.M23 + vector.z * matrix.M33 + vector.w * matrix.M43;
-            result.w = vector.x * matrix.M14 + vector.y * matrix.M24 + vector.z * matrix.M34 + vector.w * matrix.M44;
+            result.x = vector.x * matrix.M11 + vector.y * matrix.M12 + vector.z * matrix.M13 + vector.w * matrix.M14;
+            result.y = vector.x * matrix.M21 + vector.y * matrix.M22 + vector.z * matrix.M23 + vector.w * matrix.M24;
+            result.z = vector.x * matrix.M31 + vector.y * matrix.M32 + vector.z * matrix.M33 + vector.w * matrix.M34;
+            result.w = vector.x * matrix.M41 + vector.y * matrix.M42 + vector.z * matrix.M43 + vector.w * matrix.M44;
         }
         #endregion
 

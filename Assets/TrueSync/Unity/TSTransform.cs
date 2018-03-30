@@ -318,7 +318,7 @@ namespace TrueSync {
 
         public TSVector TransformPoint(TSVector point)
         {
-            return TransformPoint(point.ToTSVector4()).ToTSVector();
+            return TSVector4.Transform(point, localToWorldMatrix).ToTSVector();
         }
 
         /**
