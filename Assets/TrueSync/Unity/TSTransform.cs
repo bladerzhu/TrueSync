@@ -83,6 +83,26 @@ namespace TrueSync {
 
         [SerializeField]
         [HideInInspector]
+        [AddTracking]
+        private TSVector _localScale;
+
+        /**
+        *  @brief Property access to local scale. 
+        **/
+        public TSVector localScale
+        {
+            get
+            {
+                return _localScale;
+            }
+            set
+            {
+                _localScale = value;
+            }
+        }
+
+        [SerializeField]
+        [HideInInspector]
         private bool _serialized;
 
         private TSVector scaledCenter {
@@ -453,7 +473,8 @@ namespace TrueSync {
             if (transform.hasChanged) {
                 _position = transform.position.ToTSVector();
                 _rotation = transform.rotation.ToTSQuaternion();
-                _scale = transform.localScale.ToTSVector();
+                _localScale = transform.localScale.ToTSVector();
+                _scale = transform.lossyScale.ToTSVector();
 
                 _serialized = true;
             }
@@ -464,19 +485,20 @@ namespace TrueSync {
                 if (rb.interpolation == TSRigidBody.InterpolateMode.Interpolate) {
                     transform.position = Vector3.Lerp(transform.position, position.ToVector(), Time.deltaTime * DELTA_TIME_FACTOR);
                     transform.rotation = Quaternion.Lerp(transform.rotation, rotation.ToQuaternion(), Time.deltaTime * DELTA_TIME_FACTOR);
-                    transform.localScale = Vector3.Lerp(transform.localScale, scale.ToVector(), Time.deltaTime * DELTA_TIME_FACTOR);
+                    transform.localScale = Vector3.Lerp(transform.localScale, localScale.ToVector(), Time.deltaTime * DELTA_TIME_FACTOR);
                     return;
                 } else if (rb.interpolation == TSRigidBody.InterpolateMode.Extrapolate) {
                     transform.position = (position + rb.tsCollider.Body.TSLinearVelocity * Time.deltaTime * DELTA_TIME_FACTOR).ToVector();
                     transform.rotation = Quaternion.Lerp(transform.rotation, rotation.ToQuaternion(), Time.deltaTime * DELTA_TIME_FACTOR);
-                    transform.localScale = Vector3.Lerp(transform.localScale, scale.ToVector(), Time.deltaTime * DELTA_TIME_FACTOR);
+                    transform.localScale = Vector3.Lerp(transform.localScale, localScale.ToVector(), Time.deltaTime * DELTA_TIME_FACTOR);
                     return;
                 }
 			}
 
             transform.position = position.ToVector();
             transform.rotation = rotation.ToQuaternion();
-            transform.localScale = scale.ToVector();
+            transform.localScale = localScale.ToVector();
+            _scale = transform.lossyScale.ToTSVector();
         }
 
     }
