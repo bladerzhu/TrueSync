@@ -1143,13 +1143,6 @@ namespace TrueSync
 
         public static void TRS(TSVector translation, TSQuaternion rotation, TSVector scale, out TSMatrix4x4 matrix)
         {
-            TSMatrix4x4 scaleMatrix = TSMatrix4x4.CreateFromScale(scale);
-            UnityEngine.Matrix4x4 scaleMatrix1 = UnityEngine.Matrix4x4.Scale(scale.ToVector());
-            TSMatrix4x4 rotationMatrix = CreateFromQuaternion(rotation);
-            UnityEngine.Matrix4x4 rotationMatrix1 = UnityEngine.Matrix4x4.Rotate(rotation.ToQuaternion());
-            TSMatrix4x4 translationMatrix = CreateFromTranslation(translation);
-            UnityEngine.Matrix4x4 translationMatrix1 = UnityEngine.Matrix4x4.Translate(translation.ToVector());
-
             matrix = TSMatrix4x4.CreateFromTranslation(translation) * TSMatrix4x4.CreateFromQuaternion(rotation) * TSMatrix4x4.CreateFromScale(scale);
         }
 
