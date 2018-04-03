@@ -397,46 +397,64 @@ namespace TrueSync
 
             FP det = a * a11 + b * a12 + c * a13 + d * a14;
 
-            if (TSMath.Abs(det) < FP.Epsilon)
+            if (det == FP.Zero)
             {
-                result = new TSMatrix4x4();
+                result.M11 = FP.PositiveInfinity;
+                result.M12 = FP.PositiveInfinity;
+                result.M13 = FP.PositiveInfinity;
+                result.M14 = FP.PositiveInfinity;
+                result.M21 = FP.PositiveInfinity;
+                result.M22 = FP.PositiveInfinity;
+                result.M23 = FP.PositiveInfinity;
+                result.M24 = FP.PositiveInfinity;
+                result.M31 = FP.PositiveInfinity;
+                result.M32 = FP.PositiveInfinity;
+                result.M33 = FP.PositiveInfinity;
+                result.M34 = FP.PositiveInfinity;
+                result.M41 = FP.PositiveInfinity;
+                result.M42 = FP.PositiveInfinity;
+                result.M43 = FP.PositiveInfinity;
+                result.M44 = FP.PositiveInfinity;
+
             }
+            else
+            {
+                FP invDet = FP.One / det;
 
-            FP invDet = FP.One / det;
+                result.M11 = a11 * invDet;
+                result.M21 = a12 * invDet;
+                result.M31 = a13 * invDet;
+                result.M41 = a14 * invDet;
 
-            result.M11 = a11 * invDet;
-            result.M21 = a12 * invDet;
-            result.M31 = a13 * invDet;
-            result.M41 = a14 * invDet;
+                result.M12 = -(b * kp_lo - c * jp_ln + d * jo_kn) * invDet;
+                result.M22 = (a * kp_lo - c * ip_lm + d * io_km) * invDet;
+                result.M32 = -(a * jp_ln - b * ip_lm + d * in_jm) * invDet;
+                result.M42 = (a * jo_kn - b * io_km + c * in_jm) * invDet;
 
-            result.M12 = -(b * kp_lo - c * jp_ln + d * jo_kn) * invDet;
-            result.M22 = (a * kp_lo - c * ip_lm + d * io_km) * invDet;
-            result.M32 = -(a * jp_ln - b * ip_lm + d * in_jm) * invDet;
-            result.M42 = (a * jo_kn - b * io_km + c * in_jm) * invDet;
+                FP gp_ho = g * p - h * o;
+                FP fp_hn = f * p - h * n;
+                FP fo_gn = f * o - g * n;
+                FP ep_hm = e * p - h * m;
+                FP eo_gm = e * o - g * m;
+                FP en_fm = e * n - f * m;
 
-            FP gp_ho = g * p - h * o;
-            FP fp_hn = f * p - h * n;
-            FP fo_gn = f * o - g * n;
-            FP ep_hm = e * p - h * m;
-            FP eo_gm = e * o - g * m;
-            FP en_fm = e * n - f * m;
+                result.M13 = (b * gp_ho - c * fp_hn + d * fo_gn) * invDet;
+                result.M23 = -(a * gp_ho - c * ep_hm + d * eo_gm) * invDet;
+                result.M33 = (a * fp_hn - b * ep_hm + d * en_fm) * invDet;
+                result.M43 = -(a * fo_gn - b * eo_gm + c * en_fm) * invDet;
 
-            result.M13 = (b * gp_ho - c * fp_hn + d * fo_gn) * invDet;
-            result.M23 = -(a * gp_ho - c * ep_hm + d * eo_gm) * invDet;
-            result.M33 = (a * fp_hn - b * ep_hm + d * en_fm) * invDet;
-            result.M43 = -(a * fo_gn - b * eo_gm + c * en_fm) * invDet;
+                FP gl_hk = g * l - h * k;
+                FP fl_hj = f * l - h * j;
+                FP fk_gj = f * k - g * j;
+                FP el_hi = e * l - h * i;
+                FP ek_gi = e * k - g * i;
+                FP ej_fi = e * j - f * i;
 
-            FP gl_hk = g * l - h * k;
-            FP fl_hj = f * l - h * j;
-            FP fk_gj = f * k - g * j;
-            FP el_hi = e * l - h * i;
-            FP ek_gi = e * k - g * i;
-            FP ej_fi = e * j - f * i;
-
-            result.M14 = -(b * gl_hk - c * fl_hj + d * fk_gj) * invDet;
-            result.M24 = (a * gl_hk - c * el_hi + d * ek_gi) * invDet;
-            result.M34 = -(a * fl_hj - b * el_hi + d * ej_fi) * invDet;
-            result.M44 = (a * fk_gj - b * ek_gi + c * ej_fi) * invDet;
+                result.M14 = -(b * gl_hk - c * fl_hj + d * fk_gj) * invDet;
+                result.M24 = (a * gl_hk - c * el_hi + d * ek_gi) * invDet;
+                result.M34 = -(a * fl_hj - b * el_hi + d * ej_fi) * invDet;
+                result.M44 = (a * fk_gj - b * ek_gi + c * ej_fi) * invDet;
+            }
         }
 
         /// <summary>
