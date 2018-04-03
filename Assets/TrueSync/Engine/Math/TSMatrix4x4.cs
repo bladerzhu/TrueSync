@@ -252,31 +252,54 @@ namespace TrueSync
             return result;
         }
 
-        private FP Determinant3x3(FP m11, FP m12, FP m13,
-            FP m21, FP m22, FP m23,
-            FP m31, FP m32, FP m33)
+        public FP determinant
         {
-            return m11 * m22 * m33 + m12 * m23 * m31 + m13 * m21 * m32 -
-                m31 * m22 * m13 - m32 * m23 * m11 - m33 * m21 * m12;
-        }
+            get
+            {
+                // | a b c d |     | f g h |     | e g h |     | e f h |     | e f g |
+                // | e f g h | = a | j k l | - b | i k l | + c | i j l | - d | i j k |
+                // | i j k l |     | n o p |     | m o p |     | m n p |     | m n o |
+                // | m n o p |
+                //
+                //   | f g h |
+                // a | j k l | = a ( f ( kp - lo ) - g ( jp - ln ) + h ( jo - kn ) )
+                //   | n o p |
+                //
+                //   | e g h |     
+                // b | i k l | = b ( e ( kp - lo ) - g ( ip - lm ) + h ( io - km ) )
+                //   | m o p |     
+                //
+                //   | e f h |
+                // c | i j l | = c ( e ( jp - ln ) - f ( ip - lm ) + h ( in - jm ) )
+                //   | m n p |
+                //
+                //   | e f g |
+                // d | i j k | = d ( e ( jo - kn ) - f ( io - km ) + g ( in - jm ) )
+                //   | m n o |
+                //
+                // Cost of operation
+                // 17 adds and 28 muls.
+                //
+                // add: 6 + 8 + 3 = 17
+                // mul: 12 + 16 = 28
 
-        public FP Determinant()
-        {
-            FP result = 
-                M11 * Determinant3x3(M22, M23, M24,
-                                  M32, M33, M34, 
-                                  M42, M43, M44)
-                - M21 * Determinant3x3(M12, M13, M14, 
-                                    M32, M33, M34, 
-                                    M42, M43, M44)
-                + M31 * Determinant3x3(M12, M13, M14, 
-                                    M22, M23, M24, 
-                                    M42, M43, M44)
-                - M41 * Determinant3x3(M12, M13, M14,
-                                    M22, M23, M24,
-                                    M32, M33, M34);
+                FP a = M11, b = M12, c = M13, d = M14;
+                FP e = M21, f = M22, g = M23, h = M24;
+                FP i = M31, j = M32, k = M33, l = M34;
+                FP m = M41, n = M42, o = M43, p = M44;
 
-            return result;
+                FP kp_lo = k * p - l * o;
+                FP jp_ln = j * p - l * n;
+                FP jo_kn = j * o - k * n;
+                FP ip_lm = i * p - l * m;
+                FP io_km = i * o - k * m;
+                FP in_jm = i * n - j * m;
+
+                return a * (f * kp_lo - g * jp_ln + h * jo_kn) -
+                       b * (e * kp_lo - g * ip_lm + h * io_km) +
+                       c * (e * jp_ln - f * ip_lm + h * in_jm) -
+                       d * (e * jo_kn - f * io_km + g * in_jm);
+            }
         }
 
         /// <summary>

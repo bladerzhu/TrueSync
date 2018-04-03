@@ -876,6 +876,13 @@ namespace TrueSync {
             return ((float)this).ToString();
         }
 
+        public string ToString(IFormatProvider provider) {
+            return ((float)this).ToString(provider);
+        }
+        public string ToString(string format) {
+            return ((float)this).ToString(format);
+        }
+
         public static FP FromRaw(long rawValue) {
             return new FP(rawValue);
         }
