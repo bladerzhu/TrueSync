@@ -524,10 +524,10 @@ namespace TrueSync
         }
 
 
-        public static TSMatrix4x4 CreateFromQuaternion(TSQuaternion quaternion)
+        public static TSMatrix4x4 Rotate(TSQuaternion quaternion)
         {
             TSMatrix4x4 result;
-            TSMatrix4x4.CreateFromQuaternion(ref quaternion, out result);
+            TSMatrix4x4.Rotate(ref quaternion, out result);
             return result;
         }
 
@@ -536,7 +536,7 @@ namespace TrueSync
         /// </summary>
         /// <param name="quaternion">The quaternion the matrix should be created from.</param>
         /// <param name="result">JMatrix representing an orientation.</param>
-        public static void CreateFromQuaternion(ref TSQuaternion quaternion, out TSMatrix4x4 result)
+        public static void Rotate(ref TSQuaternion quaternion, out TSMatrix4x4 result)
         {
             // Precalculate coordinate products
             FP x = quaternion.x * 2;
@@ -774,7 +774,7 @@ namespace TrueSync
         /// <param name="yPosition">The amount to translate on the Y-axis.</param>
         /// <param name="zPosition">The amount to translate on the Z-axis.</param>
         /// <returns>The translation matrix.</returns>
-        public static TSMatrix4x4 CreateFromTranslation(FP xPosition, FP yPosition, FP zPosition)
+        public static TSMatrix4x4 Translate(FP xPosition, FP yPosition, FP zPosition)
         {
             TSMatrix4x4 result;
 
@@ -786,9 +786,9 @@ namespace TrueSync
             return result;
         }
 
-        public static TSMatrix4x4 CreateFromTranslation(TSVector translation)
+        public static TSMatrix4x4 Translate(TSVector translation)
         {
-            return CreateFromTranslation(translation.x, translation.y, translation.z);
+            return Translate(translation.x, translation.y, translation.z);
         }
 
         /// <summary>
@@ -798,7 +798,7 @@ namespace TrueSync
         /// <param name="yScale">Value to scale by on the Y-axis.</param>
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateFromScale(FP xScale, FP yScale, FP zScale)
+        public static TSMatrix4x4 Scale(FP xScale, FP yScale, FP zScale)
         {
             TSMatrix4x4 result;
 
@@ -818,7 +818,7 @@ namespace TrueSync
         /// <param name="zScale">Value to scale by on the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateFromScale(FP xScale, FP yScale, FP zScale, TSVector centerPoint)
+        public static TSMatrix4x4 Scale(FP xScale, FP yScale, FP zScale, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -839,9 +839,9 @@ namespace TrueSync
         /// </summary>
         /// <param name="scales">The vector containing the amount to scale by on each axis.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateFromScale(TSVector scales)
+        public static TSMatrix4x4 Scale(TSVector scales)
         {
-            return CreateFromScale(scales.x, scales.y, scales.z);
+            return Scale(scales.x, scales.y, scales.z);
         }
 
         /// <summary>
@@ -850,9 +850,9 @@ namespace TrueSync
         /// <param name="scales">The vector containing the amount to scale by on each axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateFromScale(TSVector scales, TSVector centerPoint)
+        public static TSMatrix4x4 Scale(TSVector scales, TSVector centerPoint)
         {
-            return CreateFromScale(scales.x, scales.y, scales.z, centerPoint);
+            return Scale(scales.x, scales.y, scales.z, centerPoint);
         }
 
         /// <summary>
@@ -860,9 +860,9 @@ namespace TrueSync
         /// </summary>
         /// <param name="scale">The uniform scaling factor.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateFromScale(FP scale)
+        public static TSMatrix4x4 Scale(FP scale)
         {
-            return CreateFromScale(scale, scale, scale);
+            return Scale(scale, scale, scale);
         }
 
         /// <summary>
@@ -871,9 +871,9 @@ namespace TrueSync
         /// <param name="scale">The uniform scaling factor.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The scaling matrix.</returns>
-        public static TSMatrix4x4 CreateFromScale(FP scale, TSVector centerPoint)
+        public static TSMatrix4x4 Scale(FP scale, TSVector centerPoint)
         {
-            return CreateFromScale(scale, scale, scale, centerPoint);
+            return Scale(scale, scale, scale, centerPoint);
         }
 
         /// <summary>
@@ -881,7 +881,7 @@ namespace TrueSync
         /// </summary>
         /// <param name="radians">The amount, in radians, by which to rotate around the X-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateFromRotationX(FP radians)
+        public static TSMatrix4x4 RotateX(FP radians)
         {
             TSMatrix4x4 result;
 
@@ -918,7 +918,7 @@ namespace TrueSync
         /// <param name="radians">The amount, in radians, by which to rotate around the X-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateFromRotationX(FP radians, TSVector centerPoint)
+        public static TSMatrix4x4 RotateX(FP radians, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -957,7 +957,7 @@ namespace TrueSync
         /// </summary>
         /// <param name="radians">The amount, in radians, by which to rotate around the Y-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateFromRotationY(FP radians)
+        public static TSMatrix4x4 RotateY(FP radians)
         {
             TSMatrix4x4 result;
 
@@ -994,7 +994,7 @@ namespace TrueSync
         /// <param name="radians">The amount, in radians, by which to rotate around the Y-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateFromRotationY(FP radians, TSVector centerPoint)
+        public static TSMatrix4x4 RotateY(FP radians, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -1033,7 +1033,7 @@ namespace TrueSync
         /// </summary>
         /// <param name="radians">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateFromRotationZ(FP radians)
+        public static TSMatrix4x4 RotateZ(FP radians)
         {
             TSMatrix4x4 result;
 
@@ -1070,7 +1070,7 @@ namespace TrueSync
         /// <param name="radians">The amount, in radians, by which to rotate around the Z-axis.</param>
         /// <param name="centerPoint">The center point.</param>
         /// <returns>The rotation matrix.</returns>
-        public static TSMatrix4x4 CreateFromRotationZ(FP radians, TSVector centerPoint)
+        public static TSMatrix4x4 RotateZ(FP radians, TSVector centerPoint)
         {
             TSMatrix4x4 result;
 
@@ -1110,7 +1110,7 @@ namespace TrueSync
         /// <param name="axis">The axis.</param>
         /// <param name="angle">The angle.</param>
         /// <param name="result">The resulting rotation matrix</param>
-        public static void CreateFromAxisAngle(ref TSVector axis, FP angle, out TSMatrix4x4 result)
+        public static void AxisAngle(ref TSVector axis, FP angle, out TSMatrix4x4 result)
         {
             // a: angle
             // x, y, z: unit vector for axis.
@@ -1169,7 +1169,7 @@ namespace TrueSync
         public static TSMatrix4x4 AngleAxis(FP angle, TSVector axis)
         {
             TSMatrix4x4 result;
-            CreateFromAxisAngle(ref axis, angle, out result);
+            AxisAngle(ref axis, angle, out result);
             return result;
         }
 
@@ -1184,7 +1184,14 @@ namespace TrueSync
 
         public static void TRS(TSVector translation, TSQuaternion rotation, TSVector scale, out TSMatrix4x4 matrix)
         {
-            matrix = TSMatrix4x4.CreateFromTranslation(translation) * TSMatrix4x4.CreateFromQuaternion(rotation) * TSMatrix4x4.CreateFromScale(scale);
+            matrix = TSMatrix4x4.Translate(translation) * TSMatrix4x4.Rotate(rotation) * TSMatrix4x4.Scale(scale);
+        }
+
+        public static TSMatrix4x4 TRS(TSVector translation, TSQuaternion rotation, TSVector scale)
+        {
+            TSMatrix4x4 result;
+            TRS(translation, rotation, scale, out result);
+            return result;
         }
 
         public static TSMatrix4x4 TransformToMatrix(ref TSTransform transform)
