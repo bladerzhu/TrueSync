@@ -1197,7 +1197,7 @@ namespace TrueSync
         public static TSMatrix4x4 TransformToMatrix(ref TSTransform transform)
         {
             TSMatrix4x4 result;
-            TRS(transform.position, transform.rotation, transform.scale, out result);
+            TRS(transform.localPosition, transform.localRotation, transform.localScale, out result);
             return result;
         }
 

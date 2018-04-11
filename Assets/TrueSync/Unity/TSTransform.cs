@@ -13,6 +13,26 @@ namespace TrueSync {
         [SerializeField]
         [HideInInspector]
         [AddTracking]
+        private TSVector _localPosition;
+
+        /**
+         *  @brief Property access to local position. 
+         **/
+        public TSVector localPosition
+        {
+            get
+            {
+                return _localPosition;
+            }
+            set
+            {
+                _localPosition = value;
+            }
+        }
+
+        [SerializeField]
+        [HideInInspector]
+        [AddTracking]
         private TSVector _position;
 
         /**
@@ -34,6 +54,28 @@ namespace TrueSync {
                 if (tsCollider != null && tsCollider.Body != null) {
                     tsCollider.Body.TSPosition = _position + scaledCenter;
                 }
+
+                _localPosition = this.TransformPoint(position);
+            }
+        }
+
+        [SerializeField]
+        [HideInInspector]
+        [AddTracking]
+        private TSQuaternion _localRotation;
+
+        /**
+         *  @brief Property access to local rotation. 
+         **/
+        public TSQuaternion localRotation
+        {
+            get
+            {
+                return _localRotation;
+            }
+            set
+            {
+                _localRotation = value;
             }
         }
 
@@ -315,6 +357,12 @@ namespace TrueSync {
             {
                 TSTransform thisTransform = this;
                 TSMatrix4x4 curMatrix = TSMatrix4x4.TransformToMatrix(ref thisTransform);
+                TSTransform parent = tsParent;
+                while (parent != null)
+                {
+                    curMatrix = TSMatrix4x4.TransformToMatrix(ref parent) * curMatrix;
+                    parent = parent.tsParent;
+                }
                 return curMatrix;
             }
         }
@@ -361,12 +409,13 @@ namespace TrueSync {
         public TSVector4 TransformDirection(TSVector4 direction)
         {
             Debug.Assert(direction.w == FP.Zero);
-            return TSVector4.Normalize(TSVector4.Transform(direction, localToWorldMatrix));
+            TSMatrix4x4 matrix = TSMatrix4x4.Translate(position) * TSMatrix4x4.Rotate(rotation);
+            return TSVector4.Transform(direction, matrix);
         }
 
         public TSVector TransformDirection(TSVector direction)
         {
-            return TSVector.Normalize(TransformDirection(new TSVector4(direction.x, direction.y, direction.z, FP.Zero)).ToTSVector());
+            return TransformDirection(new TSVector4(direction.x, direction.y, direction.z, FP.Zero)).ToTSVector();
         }
 
         /**
@@ -375,12 +424,13 @@ namespace TrueSync {
         public TSVector4 InverseTransformDirection(TSVector4 direction)
         {
             Debug.Assert(direction.w == FP.Zero);
-            return TSVector4.Normalize(TSVector4.Transform(direction, worldToLocalMatrix));
+            TSMatrix4x4 matrix = TSMatrix4x4.Translate(position) * TSMatrix4x4.Rotate(rotation);
+            return TSVector4.Transform(direction, TSMatrix4x4.Inverse(matrix));
         }
 
         public TSVector InverseTransformDirection(TSVector direction)
         {
-            return TSVector.Normalize(InverseTransformDirection(new TSVector4(direction.x, direction.y, direction.z, FP.Zero)).ToTSVector());
+            return InverseTransformDirection(new TSVector4(direction.x, direction.y, direction.z, FP.Zero)).ToTSVector();
         }
 
         /**
@@ -473,8 +523,11 @@ namespace TrueSync {
             if (transform.hasChanged) {
                 _position = transform.position.ToTSVector();
                 _rotation = transform.rotation.ToTSQuaternion();
-                _localScale = transform.localScale.ToTSVector();
                 _scale = transform.lossyScale.ToTSVector();
+
+                _localPosition = transform.localPosition.ToTSVector();
+                _localRotation = transform.localRotation.ToTSQuaternion();
+                _localScale = transform.localScale.ToTSVector();
 
                 _serialized = true;
             }
