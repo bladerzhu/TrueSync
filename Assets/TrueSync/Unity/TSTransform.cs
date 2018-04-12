@@ -43,10 +43,10 @@ namespace TrueSync {
         public TSVector position {
             get {
                 if (tsCollider != null && tsCollider.Body != null) {
-					return tsCollider.Body.TSPosition - scaledCenter;
+                    _position = tsCollider.Body.TSPosition - scaledCenter;
                 }
 
-				return _position;
+                return _position;
             }
             set {
                 _position = value;
@@ -54,8 +54,6 @@ namespace TrueSync {
                 if (tsCollider != null && tsCollider.Body != null) {
                     tsCollider.Body.TSPosition = _position + scaledCenter;
                 }
-
-                _localPosition = this.TransformPoint(position);
             }
         }
 
@@ -534,7 +532,20 @@ namespace TrueSync {
         }
 
         private void UpdatePlayMode() {
-			if (rb != null) {
+
+            if (tsParent != null)
+            {
+                _localPosition = tsParent.InverseTransformPoint(position);
+                TSMatrix matrix = TSMatrix.CreateFromQuaternion(tsParent.rotation);
+                _localRotation = TSQuaternion.CreateFromMatrix(TSMatrix.Inverse(matrix)) * rotation;
+            }
+            else
+            {
+                _localPosition = position;
+                _localRotation = rotation;
+            }
+
+            if (rb != null) {
                 if (rb.interpolation == TSRigidBody.InterpolateMode.Interpolate) {
                     transform.position = Vector3.Lerp(transform.position, position.ToVector(), Time.deltaTime * DELTA_TIME_FACTOR);
                     transform.rotation = Quaternion.Lerp(transform.rotation, rotation.ToQuaternion(), Time.deltaTime * DELTA_TIME_FACTOR);
