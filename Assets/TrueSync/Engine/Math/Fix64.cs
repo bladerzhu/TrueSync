@@ -684,8 +684,62 @@ namespace TrueSync {
             return a2;
         }
 
-        public static FP Atan(FP y) {
-            return Atan2(y, 1);
+        /// <summary>
+        /// Returns the arctan of of the specified number, calculated using Euler series
+        /// This function has at least 7 decimals of accuracy.
+        /// </summary>
+        public static FP Atan(FP z)
+        {
+            if (z.RawValue == 0) return Zero;
+
+            // Force positive values for argument
+            // Atan(-z) = -Atan(z).
+            var neg = z.RawValue < 0;
+            if (neg)
+            {
+                z = -z;
+            }
+
+            FP result;
+            var two = (FP)2;
+            var three = (FP)3;
+
+            bool invert = z > One;
+            if (invert) z = One / z;
+
+            result = One;
+            var term = One;
+
+            var zSq = z * z;
+            var zSq2 = zSq * two;
+            var zSqPlusOne = zSq + One;
+            var zSq12 = zSqPlusOne * two;
+            var dividend = zSq2;
+            var divisor = zSqPlusOne * three;
+
+            for (var i = 2; i < 30; ++i)
+            {
+                term *= dividend / divisor;
+                result += term;
+
+                dividend += zSq2;
+                divisor += zSq12;
+
+                if (term.RawValue == 0) break;
+            }
+
+            result = result * z / zSqPlusOne;
+
+            if (invert)
+            {
+                result = PiOver2 - result;
+            }
+
+            if (neg)
+            {
+                result = -result;
+            }
+            return result;
         }
 
         public static FP Atan2(FP y, FP x) {
@@ -730,39 +784,21 @@ namespace TrueSync {
             return FastSub(PiOver2, Acos(value));
         }
 
-        public static FP Acos(FP value) {
-            if (value == 0) {
-                return FP.PiOver2;
+        /// <summary>
+        /// Returns the arccos of of the specified number, calculated using Atan and Sqrt
+        /// This function has at least 7 decimals of accuracy.
+        /// </summary>
+        public static FP Acos(FP x)
+        {
+            if (x < -One || x > One)
+            {
+                throw new ArgumentOutOfRangeException("Must between -FP.One and FP.One", "x");
             }
 
-            bool flip = false;
-            if (value < 0) {
-                value = -value;
-                flip = true;
-            }
+            if (x.RawValue == 0) return PiOver2;
 
-            // Find the two closest values in the LUT and perform linear interpolation
-            var rawIndex = FastMul(value, LUT_SIZE);
-            var roundedIndex = Round(rawIndex);
-            if (roundedIndex >= LUT_SIZE) {
-                roundedIndex = LUT_SIZE - 1;
-            }
-
-            var indexError = FastSub(rawIndex, roundedIndex);
-            var nearestValue = new FP(AcosLut[(int)roundedIndex]);
-
-            var nextIndex = (int)roundedIndex + Sign(indexError);
-            if (nextIndex >= LUT_SIZE) {
-                nextIndex = LUT_SIZE - 1;
-            }
-
-            var secondNearestValue = new FP(AcosLut[nextIndex]);
-
-            var delta = FastMul(indexError, FastAbs(FastSub(nearestValue, secondNearestValue)))._serializedValue;
-            FP interpolatedValue = new FP(nearestValue._serializedValue + delta);
-            FP finalValue = flip ? (FP.Pi - interpolatedValue) : interpolatedValue;
-
-            return finalValue;
+            var result = Atan(Sqrt(One - x * x) / x);
+            return x.RawValue < 0 ? result + Pi : result;
         }
 
         public static implicit operator FP(long value) {
