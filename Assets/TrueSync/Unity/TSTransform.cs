@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace TrueSync {
 
@@ -35,6 +36,7 @@ namespace TrueSync {
         [AddTracking]
         private TSVector _position;
 
+        private TSVector _prevPosition;
         /**
         *  @brief Property access to position. 
         *  
@@ -43,17 +45,20 @@ namespace TrueSync {
         public TSVector position {
             get {
                 if (tsCollider != null && tsCollider.Body != null) {
-                    _position = tsCollider.Body.TSPosition - scaledCenter;
+                    position = tsCollider.Body.TSPosition - scaledCenter;
                 }
 
                 return _position;
             }
             set {
+                _prevPosition = _position;
                 _position = value;
 
                 if (tsCollider != null && tsCollider.Body != null) {
                     tsCollider.Body.TSPosition = _position + scaledCenter;
                 }
+
+                UpdateChildPosition();
             }
         }
 
@@ -90,7 +95,7 @@ namespace TrueSync {
         public TSQuaternion rotation {
             get {
                 if (tsCollider != null && tsCollider.Body != null) {
-                    return TSQuaternion.CreateFromMatrix(tsCollider.Body.TSOrientation);
+                    rotation = TSQuaternion.CreateFromMatrix(tsCollider.Body.TSOrientation);
                 }
 
                 return _rotation;
@@ -101,6 +106,8 @@ namespace TrueSync {
                 if (tsCollider != null && tsCollider.Body != null) {
                     tsCollider.Body.TSOrientation = TSMatrix.CreateFromQuaternion(_rotation);
                 }
+
+                UpdateChildRotation();
             }
         }
 
@@ -465,6 +472,9 @@ namespace TrueSync {
         [HideInInspector]
         public TSTransform tsParent;
 
+        [HideInInspector]
+        public List<TSTransform> tsChildren;
+
         private bool initialized = false;
 
 		private TSRigidBody rb;
@@ -489,6 +499,14 @@ namespace TrueSync {
             tsCollider = GetComponent<TSCollider>();
             if (transform.parent != null) {
                 tsParent = transform.parent.GetComponent<TSTransform>();
+            }
+
+            foreach (Transform child in transform) {
+                TSTransform tsChild = child.GetComponent<TSTransform>();
+                if (tsChild != null) {
+                    tsChildren.Add(tsChild);
+                }
+
             }
 
             if (!_serialized) {
@@ -565,6 +583,20 @@ namespace TrueSync {
             _scale = transform.lossyScale.ToTSVector();
         }
 
+        private void UpdateChildPosition() {           
+            foreach (TSTransform child in tsChildren) {
+                child.Translate(_position - _prevPosition);
+            }
+        }
+
+        private void UpdateChildRotation() {
+            TSMatrix matrix = TSMatrix.CreateFromQuaternion(_rotation);
+            foreach (TSTransform child in tsChildren) {
+                child.localRotation = TSQuaternion.CreateFromMatrix(TSMatrix.Inverse(matrix)) * _rotation;
+                child.localPosition = TSVector.Transform(child.localPosition, TSMatrix.CreateFromQuaternion(child.localRotation));
+                child.position = TransformPoint(child.localPosition);
+            }
+        }
     }
 
 }
